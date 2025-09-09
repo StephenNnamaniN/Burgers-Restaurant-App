@@ -9,6 +9,6 @@ This is a **lean starter repo** for the YouTube series watch here(Youtube link)
 - Image **Assets**
 
 ## Quick Start
-1. Open in **Android Studion Narwal+**
+1. Open in **Android Studio Narwal+**
 2. Add your Firebase 'google-services.json' to 'app/' and enable providers
 3. Sync Gradle and run.

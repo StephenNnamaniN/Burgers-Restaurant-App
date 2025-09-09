@@ -2,6 +2,9 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.serialization)
+//    alias(libs.plugins.google.services)
+    id("com.google.devtools.ksp")
 }
 
 android {
@@ -56,4 +59,26 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+
+
+    // Koin
+    implementation(libs.koin.android)
+    implementation(libs.koin.androidx.compose)
+    implementation(libs.koin.androidx.compose.navigation)
+
+    // Koin Annotations and ksp compiler
+    implementation(libs.koin.annotations)
+    ksp(libs.koin.ksp.compiler)
+
+    // Kotlinx serialization
+    implementation(libs.kotlinx.serialization)
+
+    // Coil
+    implementation(libs.coil3)
+    implementation(libs.coil3.compose)
+    implementation(libs.coil3.compose.core)
+    implementation(libs.coil3.network.ktor)
+
+    // Coroutines
+    implementation(libs.kotlinx.coroutines.android)
 }
