@@ -1,7 +1,7 @@
 package com.stephennnamani.burgerrestaurantapp
 
 import android.app.Application
-import com.stephennnamani.burgerrestaurantapp.di.appModule
+import com.stephennnamani.burgerrestaurantapp.core.di.appModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
 

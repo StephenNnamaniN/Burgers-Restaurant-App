@@ -36,6 +36,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.google.firebase.auth.FirebaseAuth
 import com.stephennnamani.burgerrestaurantapp.R
+import com.stephennnamani.burgerrestaurantapp.core.data.auth.GoogleUiClient
 import com.stephennnamani.burgerrestaurantapp.ui.theme.BrandBrown
 import com.stephennnamani.burgerrestaurantapp.ui.theme.BrandYellow
 import com.stephennnamani.burgerrestaurantapp.ui.theme.FontSize
@@ -47,7 +48,10 @@ import org.koin.compose.koinInject
 @Composable
 fun SplashScreen(
     navigateToAuth: () -> Unit,
+    navigateToHome: () -> Unit
 ){
+    val googleAuthUiClient : GoogleUiClient = koinInject()
+
     val scale = remember { Animatable(0f) }
 
     LaunchedEffect(key1 = true, block = {
@@ -95,7 +99,12 @@ fun SplashScreen(
         Spacer(modifier = Modifier.height(100.dp))
         SplashButton(
             onClick = {
-                navigateToAuth()
+                val user = googleAuthUiClient.currentUser
+                if (user != null){
+                    navigateToHome()
+                } else {
+                    navigateToAuth()
+                }
             }
         )
     }

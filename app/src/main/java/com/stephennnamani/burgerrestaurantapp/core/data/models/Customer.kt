@@ -1,4 +1,4 @@
-package com.stephennnamani.burgerrestaurantapp.core
+package com.stephennnamani.burgerrestaurantapp.core.data.models
 
 import kotlinx.serialization.Serializable
 

@@ -1,4 +1,4 @@
-package com.stephennnamani.burgerrestaurantapp.feature
+package com.stephennnamani.burgerrestaurantapp.feature.home
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column

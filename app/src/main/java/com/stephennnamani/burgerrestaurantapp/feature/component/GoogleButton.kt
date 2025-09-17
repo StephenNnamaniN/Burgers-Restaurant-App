@@ -54,6 +54,7 @@ fun GoogleButton(
     LaunchedEffect(loading) {
         buttonText = if (loading) secondaryText else primaryText
     }
+
     Surface(
         modifier = modifier
             .clip(shape)
@@ -62,9 +63,7 @@ fun GoogleButton(
                 color = borderColor,
                 shape = shape
             )
-            .clickable(enabled = !loading) {
-                onClick()
-            },
+            .clickable(enabled = !loading) { onClick() },
         color = backgroundColor
     ) {
         Row(
@@ -85,13 +84,13 @@ fun GoogleButton(
                             contentDescription = "Google logo",
                             tint = Color.Unspecified
                         )
-                    } else {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(24.dp),
-                            strokeWidth = 2.dp,
-                            color = progressIndicatorColor
-                        )
                     }
+                } else {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(24.dp),
+                        strokeWidth = 2.dp,
+                        color = progressIndicatorColor
+                    )
                 }
             }
             Spacer(modifier = Modifier.width(12.dp))

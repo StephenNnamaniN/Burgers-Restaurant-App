@@ -33,7 +33,7 @@ fun PrimaryButton(
 ){
     Button(
         modifier = modifier.fillMaxWidth(),
-        onClick = onClick,
+        onClick = { onClick() },
         enabled = enabled,
         shape = RoundedCornerShape(12.dp),
         colors = ButtonDefaults.buttonColors(
