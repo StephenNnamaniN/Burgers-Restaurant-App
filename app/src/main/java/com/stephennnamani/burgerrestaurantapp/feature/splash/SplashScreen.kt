@@ -34,7 +34,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.google.firebase.auth.FirebaseAuth
 import com.stephennnamani.burgerrestaurantapp.R
 import com.stephennnamani.burgerrestaurantapp.core.data.auth.GoogleUiClient
 import com.stephennnamani.burgerrestaurantapp.ui.theme.BrandBrown
