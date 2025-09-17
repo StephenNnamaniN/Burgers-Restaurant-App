@@ -8,10 +8,10 @@
             <InsightsFilterSettings>
               <option name="connection">
                 <ConnectionSetting>
-                  <option name="appId" value="PLACEHOLDER" />
-                  <option name="mobileSdkAppId" value="" />
-                  <option name="projectId" value="" />
-                  <option name="projectNumber" value="" />
+                  <option name="appId" value="com.stephennnamani.burgerrestaurantapp" />
+                  <option name="mobileSdkAppId" value="1:155467344487:android:12ea7e22ddb37b221cc2c2" />
+                  <option name="projectId" value="burger-restaurant-app" />
+                  <option name="projectNumber" value="155467344487" />
                 </ConnectionSetting>
               </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />

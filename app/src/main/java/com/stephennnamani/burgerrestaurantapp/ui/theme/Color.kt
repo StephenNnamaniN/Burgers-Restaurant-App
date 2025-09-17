@@ -29,8 +29,8 @@ val Red = Color(0xFFDD0000)
 //val CategoryRed = Color(0xFFFF5E60)
 
 val Surface = White
-val SurfaceLighter = LightGray
-val SurfaceDarker = Gray
+val SurfaceLight = LightGray
+val SurfaceDark = Gray
 val SurfaceBrand = BrandBrown
 val SurfaceError = Red
 val SurfaceSecondary = BrandBrown

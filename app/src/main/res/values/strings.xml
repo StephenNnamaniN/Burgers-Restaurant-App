@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">Burger Restaurant App</string>
+    <string name="splash_header">Are You Hungry?</string>
+    <string name="splash_subtext">Burger will deliver the treat \nyour palate can\'t resist</string>
+    <string name="splash_btn_text">Let\'s order a meal</string>
+    <string name="sign_in_text">Sign in to continue</string>
+    <string name="guest_text">Browse as guest</string>
+    <string name="default_web_client_id">155467344487-a8u99jb9nu8rucpcqh7sobkika7j4tda.apps.googleusercontent.com</string>
 </resources>
