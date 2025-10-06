@@ -49,5 +49,5 @@ val ButtonSecondary = DarkGray
 val ButtonDisabled = DarkGray
 
 val IconPrimary = Black
-val IconSecondary = BrandBrown
+val IconSecondary = BrandYellow
 val IconWhite = White

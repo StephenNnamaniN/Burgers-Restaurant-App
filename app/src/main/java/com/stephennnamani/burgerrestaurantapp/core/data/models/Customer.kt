@@ -11,7 +11,7 @@ data class Customer(
     val city: String? = null,
     val postalCode: Int? = null,
     val phoneNumber: PhoneNumber? = null,
-    val isAdmin: Boolean = false
+    val isAdmin: Boolean = false,
 )
 
 @Serializable

@@ -9,6 +9,7 @@ import com.stephennnamani.burgerrestaurantapp.core.data.auth.GoogleUiClient
 import com.stephennnamani.burgerrestaurantapp.core.data.domain.CustomerRepository
 import com.stephennnamani.burgerrestaurantapp.core.data.repoImpl.CustomerRepoImpl
 import com.stephennnamani.burgerrestaurantapp.feature.auth.AuthViewModel
+import com.stephennnamani.burgerrestaurantapp.feature.home.HomeViewModel
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
@@ -19,7 +20,8 @@ val appModule = module {
 
     single<CustomerRepository> { CustomerRepoImpl() }
 
-    viewModel { AuthViewModel(get(), auth = get()) }
+    viewModel { AuthViewModel(get()) }
+    viewModel { HomeViewModel(get()) }
 
     single {
         GoogleUiClient(

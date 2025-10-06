@@ -18,13 +18,13 @@ koinKspCompiler = "2.1.0"
 kotlinxCoroutinesAndroid = "1.10.2"
 google = "4.4.3"
 serialization = "1.9.0"
-navigationCompose = "2.9.4"
+navigationCompose = "2.9.5"
 googleGmsGoogleServices = "4.4.3"
 firebaseAuth = "24.0.1"
 credentials = "1.5.0"
 credentialsPlayServicesAuth = "1.5.0"
 googleid = "1.1.1"
-firebaseFirestore = "26.0.0"
+firebaseFirestore = "26.0.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }

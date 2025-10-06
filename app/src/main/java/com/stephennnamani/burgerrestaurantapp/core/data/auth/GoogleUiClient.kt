@@ -2,6 +2,7 @@ package com.stephennnamani.burgerrestaurantapp.core.data.auth
 
 import android.app.Activity
 import android.content.Context
+import android.util.Log
 import androidx.credentials.ClearCredentialStateRequest
 import androidx.credentials.CredentialManager
 import androidx.credentials.CustomCredential
@@ -22,6 +23,7 @@ class GoogleUiClient(
     private val credManager by lazy { CredentialManager.Companion.create(context) }
 
     suspend fun signInWithGoogle(activity: Activity): AuthResult {
+        Log.d("GoogleSignIn", "Using serverClient: $serverClient")
         val googleIdOption = GetGoogleIdOption.Builder()
             .setServerClientId(serverClient)
             .setFilterByAuthorizedAccounts(false)
@@ -31,11 +33,14 @@ class GoogleUiClient(
             .addCredentialOption(googleIdOption)
             .build()
 
+        Log.d("GoogleSignIn", "Starting credential request...")
         val result = credManager.getCredential(activity, request)
 
 
+        Log.d("GoogleSignIn", "Credential received successfully")
         val googCred = when (val cred = result.credential){
             is CustomCredential -> {
+                Log.d("GoogleSignIn", "signInWithGoogle: Couldn't find the required credentials")
                 if (cred.type == GoogleIdTokenCredential.Companion.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL){
                     GoogleIdTokenCredential.Companion.createFrom(cred.data)
                 } else error("Unsupported credential type: ${cred.type}")
@@ -44,6 +49,7 @@ class GoogleUiClient(
         }
 
         val idToken = googCred.idToken
+        Log.d("GoogleSignIn", "Google ID token received")
         val firebaseCred = GoogleAuthProvider.getCredential(idToken, null)
         return auth.signInWithCredential(firebaseCred).await()
     }

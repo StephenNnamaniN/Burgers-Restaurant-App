@@ -13,4 +13,16 @@ sealed class Screens {
 
     @Serializable
     data object HomeGraph: Screens()
+
+    @Serializable
+    data object ProductOverviewScreen: Screens()
+
+    @Serializable
+    data object Cart: Screens()
+
+    @Serializable
+    data object Notifications: Screens()
+
+    @Serializable
+    data object Categories: Screens()
 }
