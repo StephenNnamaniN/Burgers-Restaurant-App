@@ -1,7 +1,9 @@
 package com.stephennnamani.burgerrestaurantapp.core.data.domain
 
 import com.google.firebase.auth.FirebaseUser
+import com.stephennnamani.burgerrestaurantapp.core.data.models.Customer
 import com.stephennnamani.burgerrestaurantapp.feature.util.RequestState
+import kotlinx.coroutines.flow.Flow
 
 interface CustomerRepository {
     fun getCurrentUserId(): String?
@@ -12,5 +14,11 @@ interface CustomerRepository {
         onError: (String) -> Unit
     )
 
+    suspend fun readCustomerFlow(): Flow<RequestState<Customer>>
+    suspend fun updateCustomer(
+        customer: Customer,
+        onSuccess: () -> Unit,
+        onError: (String) -> Unit
+    )
     suspend fun signOut(): RequestState<Unit>
 }

@@ -1,0 +1,30 @@
+package com.stephennnamani.burgerrestaurantapp.feature.component
+
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.TextUnit
+import com.stephennnamani.burgerrestaurantapp.ui.theme.FontSize
+
+@Composable
+fun ErrorCard(
+    modifier: Modifier = Modifier,
+    message: String,
+    fonSize: TextUnit = FontSize.SMALL
+){
+    Box(
+        modifier = modifier,
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            modifier = Modifier.fillMaxWidth(),
+            text = message,
+            fontSize = fonSize,
+            textAlign = TextAlign.Center
+        )
+    }
+}

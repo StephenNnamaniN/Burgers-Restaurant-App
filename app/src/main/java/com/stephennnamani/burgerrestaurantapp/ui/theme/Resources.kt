@@ -30,6 +30,7 @@ object Resources {
         val Bell = R.drawable.icon_belloutline
         val Gift = R.drawable.icon_gift
         val Heart = R.drawable.icon_heartoutline
+        val Dog = R.drawable.dog
     }
     object Image {
         val ShoppingCart = R.drawable.shopping_cart_image

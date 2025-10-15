@@ -59,7 +59,8 @@ import org.koin.androidx.compose.koinViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
-    navigateToAuth: () -> Unit
+    navigateToAuth: () -> Unit,
+    navigateToProfile: () -> Unit
 ){
     val navController = rememberNavController()
     val currentRoute = navController.currentBackStackEntryAsState()
@@ -106,7 +107,7 @@ fun HomeScreen(
             .systemBarsPadding()
     ){
         CustomDrawer(
-            onProfileClick = {},
+            onProfileClick = navigateToProfile,
             onContactUsClick = {},
             onSignOutClick = {
                 viewModel.signOut(
@@ -155,11 +156,24 @@ fun HomeScreen(
                             IconButton(
                                 onClick = { drawerState = drawerState.reverse()}
                             ) {
-                                Icon(
-                                    painter = painterResource(R.drawable.menu),
-                                    contentDescription = "Menu icon",
-                                    tint = IconPrimary
-                                )
+                                AnimatedContent(
+                                    targetState = drawerState
+                                ) { drawer ->
+                                    if (!drawer.isOpened()){
+                                        Icon(
+                                            painter = painterResource(R.drawable.menu),
+                                            contentDescription = "Menu icon",
+                                            tint = IconPrimary
+                                        )
+                                    } else {
+                                        Icon(
+                                            painter = painterResource(R.drawable.close),
+                                            contentDescription = "Menu icon",
+                                            tint = IconPrimary
+                                        )
+                                    }
+                                }
+
                             }
                         },
                         colors = TopAppBarDefaults.centerAlignedTopAppBarColors(

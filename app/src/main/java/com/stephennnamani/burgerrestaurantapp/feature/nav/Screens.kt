@@ -25,4 +25,7 @@ sealed class Screens {
 
     @Serializable
     data object Categories: Screens()
+
+    @Serializable
+    data object Profile: Screens()
 }

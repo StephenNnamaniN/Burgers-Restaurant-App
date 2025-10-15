@@ -9,9 +9,11 @@ data class Customer(
     val lastName: String,
     val email: String,
     val city: String? = null,
+    val address: String? = null,
     val postalCode: Int? = null,
     val phoneNumber: PhoneNumber? = null,
     val isAdmin: Boolean = false,
+    val profilePictureUrl: String?
 )
 
 @Serializable
