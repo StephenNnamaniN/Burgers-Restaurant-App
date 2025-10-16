@@ -7,6 +7,7 @@ import com.google.firebase.auth.auth
 import com.google.firebase.firestore.firestore
 import com.google.firebase.firestore.snapshots
 import com.stephennnamani.burgerrestaurantapp.core.data.domain.CustomerRepository
+import com.stephennnamani.burgerrestaurantapp.core.data.models.Country
 import com.stephennnamani.burgerrestaurantapp.core.data.models.Customer
 import com.stephennnamani.burgerrestaurantapp.core.data.models.PhoneNumber
 import com.stephennnamani.burgerrestaurantapp.feature.util.RequestState
@@ -34,8 +35,8 @@ class CustomerRepoImpl: CustomerRepository {
             if (!snapshot.exists()) {
                 val customer = Customer(
                     id = user.uid,
-                    firstName = user.displayName?.split(" ")?.firstOrNull() ?: "Uknown",
-                    lastName = user.displayName?.split(" ")?.lastOrNull() ?: "Uknown",
+                    firstName = user.displayName?.split(" ")?.firstOrNull() ?: "Unknown",
+                    lastName = user.displayName?.split(" ")?.lastOrNull() ?: "Unknown",
                     email = user.email ?: "Unknown",
                     profilePictureUrl = user.photoUrl.toString()
                 )
@@ -73,6 +74,22 @@ class CustomerRepoImpl: CustomerRepository {
                                 }
                             }
 
+                            val countryMap = documentSnapshot.get("country") as? Map<*, *>
+                            val country = countryMap?.let { map ->
+                                val name = map["name"] as? String
+                                val code = map["code"] as? String
+                                val dialCode = (map["diaCode"] as? Long)?.toInt()
+                                val flagUrl = map["flagUrl"] as? String
+                                if (name != null && code != null && dialCode != null && flagUrl != null)
+                                    Country(
+                                        name = name,
+                                        code = code,
+                                        dialCode = dialCode,
+                                        flagUrl = flagUrl
+                                    )
+                                else null
+                            }
+
                             val customer = Customer(
                                 id = documentSnapshot.id,
                                 firstName = documentSnapshot.get("firstName") as String,
@@ -82,6 +99,7 @@ class CustomerRepoImpl: CustomerRepository {
                                 postalCode = postalCode,
                                 phoneNumber = phoneNumber,
                                 address = documentSnapshot.get("address") as String?,
+                                country = country,
                                 profilePictureUrl = documentSnapshot.get("photoUrl") as String?
                             )
                             send(RequestState.Success(data = customer))
@@ -118,6 +136,15 @@ class CustomerRepoImpl: CustomerRepository {
                         )
                     }
 
+                    val countryMap = customer.country?.let {
+                        mapOf(
+                            "name" to it.name,
+                            "code" to it.code,
+                            "dialCode" to it.dialCode,
+                            "flagUrl" to it.flagUrl
+                        )
+                    }
+
                     customerCollection
                         .document(customer.id)
                         .update(
@@ -128,6 +155,7 @@ class CustomerRepoImpl: CustomerRepository {
                                 "postalCode" to customer.postalCode,
                                 "address" to customer.address,
                                 "phoneNumber" to phoneNumberMap,
+                                "country" to countryMap
                             )
                         ).await()
                     onSuccess()
