@@ -12,6 +12,7 @@ object Resources {
         val Search = R.drawable.search
         val Person = R.drawable.user
         val Checkmark = R.drawable.check
+        val Camera = R.drawable.camera
         val Edit = R.drawable.edit
         val Menu = R.drawable.menu
         val BackArrow = R.drawable.back_arrow

@@ -1,11 +1,16 @@
 package com.stephennnamani.burgerrestaurantapp.core.data.repoImpl
 
+import android.net.Uri
+import androidx.core.net.toUri
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.auth
+import com.google.firebase.auth.userProfileChangeRequest
 import com.google.firebase.firestore.firestore
 import com.google.firebase.firestore.snapshots
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.storageMetadata
 import com.stephennnamani.burgerrestaurantapp.core.data.domain.CustomerRepository
 import com.stephennnamani.burgerrestaurantapp.core.data.models.Country
 import com.stephennnamani.burgerrestaurantapp.core.data.models.Customer
@@ -168,6 +173,48 @@ class CustomerRepoImpl: CustomerRepository {
         } catch (e: Exception) {
             onError("Error while updating customer information: ${e.message}")
         }
+    }
+
+    override suspend fun updateProfilePictureUrl(url: String): RequestState<Unit>  = try {
+        val uid = getCurrentUserId() ?: return RequestState.Error("User is not available.")
+        Firebase.firestore.collection("customer")
+            .document(uid)
+            .update("profilePhotoUrl", url)
+            .await()
+
+        try {
+            val user = FirebaseAuth.getInstance().currentUser
+            if (user != null){
+                val request = userProfileChangeRequest { photoUri = url.toUri() }
+                user.updateProfile(request).await()
+                user.reload().await()
+            }
+        } catch (_: Exception){ }
+        RequestState.Success(Unit)
+    }catch (e: Exception){
+        RequestState.Error("Error while updating profile picture url: ${e.message}")
+    }
+
+    override suspend fun uploadProfilePhoto(
+        localUrl: Uri,
+        onProgress: (Float) -> Unit
+    ): RequestState<String> = try {
+        val uid = getCurrentUserId() ?: return RequestState.Error("User is not available")
+        val storage = FirebaseStorage.getInstance().reference
+        val ref = storage.child("user/$uid/profile/profile_${System.currentTimeMillis()}.jpg")
+        val metadata = storageMetadata {
+            contentType = "image/jpeg"
+            setCustomMetadata("uploadedBy", uid)
+        }
+        val task = ref.putFile(localUrl, metadata)
+        task.addOnProgressListener { snapshot ->
+            val picture = if (snapshot.totalByteCount > 0) snapshot.bytesTransferred.toFloat() / snapshot.totalByteCount else 0f
+            onProgress(picture.coerceIn(0f, 1f))
+        }.await()
+        val url = ref.downloadUrl.await().toString()
+        RequestState.Success(url)
+    }catch (e: Exception){
+        RequestState.Error("Upload failed: ${e.message}")
     }
 
     override suspend fun signOut(): RequestState<Unit> {

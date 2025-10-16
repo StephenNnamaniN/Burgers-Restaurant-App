@@ -1,6 +1,10 @@
 package com.stephennnamani.burgerrestaurantapp.feature.profile
 
+import android.widget.Space
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -24,11 +28,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import com.google.firebase.auth.FirebaseAuth
 import com.stephennnamani.burgerrestaurantapp.feature.component.InfoCard
 import com.stephennnamani.burgerrestaurantapp.feature.component.LoadingCard
 import com.stephennnamani.burgerrestaurantapp.feature.component.PrimaryButton
 import com.stephennnamani.burgerrestaurantapp.feature.component.dialog.CountryPickerDialog
 import com.stephennnamani.burgerrestaurantapp.feature.profile.components.ProfileForm
+import com.stephennnamani.burgerrestaurantapp.feature.profile.components.ProfilePhotoEditor
 import com.stephennnamani.burgerrestaurantapp.feature.util.DisplayResult
 import com.stephennnamani.burgerrestaurantapp.feature.util.RequestState
 import com.stephennnamani.burgerrestaurantapp.ui.theme.FontSize
@@ -49,10 +55,21 @@ fun ProfileScreen(
     val screenReady = profileViewModel.screenReady
     val isFormValid = profileViewModel.isFormValid
     val countriesState = profileViewModel.countriesState
+    val photoState = profileViewModel.photState
 
     var countryDialogOpen by remember { mutableStateOf(false) }
 
     val context = LocalContext.current
+
+    val photoPicker = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickVisualMedia()
+    ) { uri ->
+        if (uri != null) profileViewModel.pickAndUploadPhoto(uri)
+    }
+    val authPhotoUrl = remember {
+        FirebaseAuth.getInstance().currentUser?.photoUrl?.toString()
+    }
+    val resolvedPhotoUrl = screenState.profilePictureUrl?.takeUnless { it.isBlank() } ?: authPhotoUrl
 
 
     Scaffold(
@@ -123,6 +140,17 @@ fun ProfileScreen(
                         modifier = Modifier.fillMaxSize(),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
+                        Spacer(modifier = Modifier.height(8.dp))
+                        ProfilePhotoEditor(
+                            photoUrl = resolvedPhotoUrl,
+                            isUploading = photoState.isUploading,
+                            progress = photoState.progress,
+                            onPickClick = {
+                                photoPicker.launch(
+                                    PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                                )
+                            }
+                        )
                         ProfileForm(
                             modifier = Modifier.weight(1f),
                             firstName = screenState.firstName,
