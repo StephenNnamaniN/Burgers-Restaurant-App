@@ -1,5 +1,5 @@
 # Burgers is a restaurant android application (Kotlin, Compose, MVVM, Koin, and Firebase-ready)
-This is a **lean starter repo** for the YouTube series watch here(Youtube link)
+This is a **lean starter repo** for the YouTube series watch here: https://www.youtube.com/playlist?list=PLjL1sOXJl22E2cFwZr_yypnPytPfVSUJY
 ## What's included
 - Jetpack **Compose** with Material3
 - **MVVM** feature structure (auth, session/splash, home, product, categories, etc...)
