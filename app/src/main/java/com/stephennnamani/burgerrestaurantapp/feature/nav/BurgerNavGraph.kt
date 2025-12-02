@@ -4,7 +4,9 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
 import com.stephennnamani.burgerrestaurantapp.feature.admin_panel.AdminPanelScreen
+import com.stephennnamani.burgerrestaurantapp.feature.admin_panel.manage_product.ManageProductScreen
 import com.stephennnamani.burgerrestaurantapp.feature.auth.AuthScreen
 import com.stephennnamani.burgerrestaurantapp.feature.home.HomeScreen
 import com.stephennnamani.burgerrestaurantapp.feature.profile.ProfileScreen
@@ -69,7 +71,20 @@ fun BurgerNavGraph(startDestination: Screens = Screens.SplashScreen){
         }
 
         composable<Screens.AdminPanel> {
-            AdminPanelScreen (
+            AdminPanelScreen(
+                navigateBack = {
+                    navController.navigateUp()
+                },
+                navigateToManageProduct = { id ->
+                    navController.navigate(Screens.ManageProduct(id = id))
+                }
+            )
+        }
+
+        composable<Screens.ManageProduct> {
+            val id = it.toRoute<Screens.ManageProduct>().id
+            ManageProductScreen(
+                id = id,
                 navigateBack = {
                     navController.navigateUp()
                 }

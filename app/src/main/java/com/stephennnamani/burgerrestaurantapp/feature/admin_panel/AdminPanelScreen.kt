@@ -24,7 +24,8 @@ import com.stephennnamani.burgerrestaurantapp.ui.theme.oswaldVariableFont
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AdminPanelScreen(
-    navigateBack: () -> Unit
+    navigateBack: () -> Unit,
+    navigateToManageProduct: (String?) -> Unit
 ){
     Scaffold(
         containerColor = Surface,
@@ -69,7 +70,7 @@ fun AdminPanelScreen(
         },
         floatingActionButton = {
             FloatingActionButton(
-                onClick = {},
+                onClick = {navigateToManageProduct(null)},
                 containerColor = ButtonPrimary,
                 contentColor = IconPrimary,
                 content = {

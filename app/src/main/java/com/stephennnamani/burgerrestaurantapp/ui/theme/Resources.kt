@@ -32,6 +32,13 @@ object Resources {
         val Gift = R.drawable.icon_gift
         val Heart = R.drawable.icon_heartoutline
         val Dog = R.drawable.dog
+        val Burgers = R.drawable.burger
+        val Nuggets = R.drawable.nuggets
+        val Wraps = R.drawable.burrito
+        val Desserts = R.drawable.cupcake
+        val Sauces = R.drawable.sauces
+        val Fries = R.drawable.french_fries
+        val Drinks = R.drawable.drinks
     }
     object Image {
         val ShoppingCart = R.drawable.shopping_cart_image
