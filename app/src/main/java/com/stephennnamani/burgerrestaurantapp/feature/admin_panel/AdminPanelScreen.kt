@@ -1,7 +1,11 @@
 package com.stephennnamani.burgerrestaurantapp.feature.admin_panel
 
-import androidx.compose.foundation.layout.Column
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -11,8 +15,14 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
+import com.stephennnamani.burgerrestaurantapp.feature.component.InfoCard
+import com.stephennnamani.burgerrestaurantapp.feature.component.LoadingCard
+import com.stephennnamani.burgerrestaurantapp.feature.component.ProductCard
+import com.stephennnamani.burgerrestaurantapp.feature.util.DisplayResult
 import com.stephennnamani.burgerrestaurantapp.ui.theme.ButtonPrimary
 import com.stephennnamani.burgerrestaurantapp.ui.theme.FontSize
 import com.stephennnamani.burgerrestaurantapp.ui.theme.IconPrimary
@@ -20,6 +30,7 @@ import com.stephennnamani.burgerrestaurantapp.ui.theme.Resources
 import com.stephennnamani.burgerrestaurantapp.ui.theme.Surface
 import com.stephennnamani.burgerrestaurantapp.ui.theme.TextPrimary
 import com.stephennnamani.burgerrestaurantapp.ui.theme.oswaldVariableFont
+import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -27,6 +38,10 @@ fun AdminPanelScreen(
     navigateBack: () -> Unit,
     navigateToManageProduct: (String?) -> Unit
 ){
+    val viewModel = koinViewModel<AdminPanelViewModel>()
+    val products = viewModel.products.collectAsState()
+
+
     Scaffold(
         containerColor = Surface,
         topBar = {
@@ -83,10 +98,52 @@ fun AdminPanelScreen(
         }
 
     ) {paddingValues ->
-        Column(
-            modifier = Modifier.padding(paddingValues)
-        ){
-
-        }
+        products.value.DisplayResult(
+            modifier = Modifier
+                .padding(
+                    top = paddingValues.calculateTopPadding(),
+                    bottom = paddingValues.calculateBottomPadding()
+                ),
+            onLoading = { LoadingCard(modifier =Modifier.fillMaxSize()) },
+            onSuccess = { latestProducts ->
+                AnimatedContent(
+                    targetState = latestProducts
+                ) { productList ->
+                    if (productList.isNotEmpty()){
+                        LazyColumn(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(12.dp),
+                            verticalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            items(
+                                items = latestProducts,
+                                key = {it.id}
+                            ){ product ->
+                                ProductCard(
+                                   product = product,
+                                    onClick = {
+                                        navigateToManageProduct(product.id)
+                                    }
+                                )
+                            }
+                        }
+                    } else {
+                        InfoCard(
+                            image = Resources.Icon.Dog,
+                            title = "Oops!",
+                            subtitle = "Product not found"
+                        )
+                    }
+                }
+            },
+            onError = { message ->
+                InfoCard(
+                    image = Resources.Icon.Dog,
+                    title = "Oops!",
+                    subtitle = message
+                )
+            }
+        )
     }
 }

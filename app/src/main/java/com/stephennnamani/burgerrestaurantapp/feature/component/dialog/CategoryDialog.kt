@@ -50,11 +50,12 @@ fun CategoryDialog(
     onSelectedCategory: (ProductCategory) -> Unit
 ){
     var selectedCategory by remember { mutableStateOf<ProductCategory?>(null) }
+
     AlertDialog(
         onDismissRequest = onDismiss,
         title = {
             Text(
-                text = "Select a country",
+                text = "Select a category",
                 fontSize = FontSize.EXTRA_MEDIUM,
                 color = TextPrimary
             )
@@ -120,8 +121,8 @@ fun CategoryDialog(
         },
         confirmButton = {
             TextButton(
-                onClick = {selectedCategory?.let {
-                    onSelectedCategory}
+                onClick = {
+                    selectedCategory?.let { onSelectedCategory(it)}
                 },
                 colors = ButtonDefaults.textButtonColors(
                     containerColor = Color.Transparent,

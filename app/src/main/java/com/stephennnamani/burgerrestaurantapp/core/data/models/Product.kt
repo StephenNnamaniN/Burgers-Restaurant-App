@@ -1,9 +1,14 @@
 package com.stephennnamani.burgerrestaurantapp.core.data.models
 
 import com.stephennnamani.burgerrestaurantapp.ui.theme.Resources
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 
-data class Product(
+
+@OptIn(ExperimentalTime::class)
+data class Product (
     val id: String,
+    val createdAt: Long = Clock.System.now().toEpochMilliseconds(),
     val title: String,
     val description: String,
     val category: String,
@@ -11,6 +16,7 @@ data class Product(
     val energyValue: Int?,
     val ingredients: String,
     val price: Double,
+    val productImage: String
 )
 
 enum class ProductCategory(

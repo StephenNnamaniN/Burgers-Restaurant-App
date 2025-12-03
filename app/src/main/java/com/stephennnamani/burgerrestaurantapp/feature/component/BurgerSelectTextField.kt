@@ -71,7 +71,7 @@ fun BurgerSelectTextField(
            )
        } else {
            Text(
-               text = placeholder,
+               text = text.ifBlank { placeholder },
                fontSize = FontSize.REGULAR,
                color = contentColor,
                maxLines = 1,

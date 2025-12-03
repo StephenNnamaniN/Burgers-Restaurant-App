@@ -1,8 +1,12 @@
 package com.stephennnamani.burgerrestaurantapp.feature.admin_panel.manage_product
 
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -22,9 +26,12 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -32,23 +39,36 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import coil3.compose.AsyncImage
+import coil3.request.ImageRequest
+import coil3.request.crossfade
 import com.stephennnamani.burgerrestaurantapp.core.data.models.ProductCategory
 import com.stephennnamani.burgerrestaurantapp.feature.component.BurgerSelectTextField
 import com.stephennnamani.burgerrestaurantapp.feature.component.BurgerTextField
+import com.stephennnamani.burgerrestaurantapp.feature.component.ErrorCard
+import com.stephennnamani.burgerrestaurantapp.feature.component.LoadingCard
 import com.stephennnamani.burgerrestaurantapp.feature.component.PrimaryButton
 import com.stephennnamani.burgerrestaurantapp.feature.component.dialog.CategoryDialog
+import com.stephennnamani.burgerrestaurantapp.feature.util.DisplayResult
+import com.stephennnamani.burgerrestaurantapp.feature.util.MessageUtils
+import com.stephennnamani.burgerrestaurantapp.feature.util.RequestState
 import com.stephennnamani.burgerrestaurantapp.ui.theme.BorderIdle
+import com.stephennnamani.burgerrestaurantapp.ui.theme.ButtonPrimary
 import com.stephennnamani.burgerrestaurantapp.ui.theme.FontSize
 import com.stephennnamani.burgerrestaurantapp.ui.theme.IconPrimary
 import com.stephennnamani.burgerrestaurantapp.ui.theme.Resources
 import com.stephennnamani.burgerrestaurantapp.ui.theme.Surface
 import com.stephennnamani.burgerrestaurantapp.ui.theme.SurfaceLight
 import com.stephennnamani.burgerrestaurantapp.ui.theme.TextPrimary
+import com.stephennnamani.burgerrestaurantapp.ui.theme.TextSecondary
 import com.stephennnamani.burgerrestaurantapp.ui.theme.oswaldVariableFont
-import kotlinx.coroutines.selects.select
+import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -56,21 +76,42 @@ fun ManageProductScreen(
     id: String?,
     navigateBack: () -> Unit
 ){
-    var selectedCategory by remember { mutableStateOf<ProductCategory?>(null) }
-    var showCategoryDialog by remember { mutableStateOf(false) }
+    val viewModel = koinViewModel<ManageProductViewModel>()
+    val screenState = viewModel.screenState
+    var showToast by remember { mutableStateOf("") }
+    val isFormValid = viewModel.isFormValid
+    val createProductState by viewModel.createProductState.collectAsState()
 
-    val allCategories = ProductCategory.entries
+    MessageUtils.ShowToast(message = showToast)
+    val context = LocalContext.current
+
+    val productImageUploadState = viewModel.imageUploaderState
+
+
+    val imagePickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent(),
+        onResult = { uri: Uri? ->
+            viewModel.uploadProductImageToStorage(uri)
+        }
+    )
+    LaunchedEffect(createProductState) {
+        if (createProductState.isSuccess()) {
+            showToast = "New product successfully added!"
+            navigateBack()
+            viewModel.resetCreateProductState()
+        }
+        if (createProductState.isError()) {
+            showToast = createProductState.getErrorMessage()
+        }
+    }
 
     AnimatedVisibility(
-        visible = showCategoryDialog
+        visible = screenState.isCategoryDialogOpen
     ) {
         CategoryDialog(
-            categories = allCategories,
-            onDismiss = {showCategoryDialog = false},
-            onSelectedCategory = { category ->
-                 selectedCategory = category
-                showCategoryDialog = false
-            }
+            categories = screenState.allCategories,
+            onDismiss = viewModel::onCategoryDialogDismiss,
+            onSelectedCategory = viewModel::onCategorySelected
         )
     }
 
@@ -128,38 +169,114 @@ fun ManageProductScreen(
                             color = BorderIdle,
                             shape = RoundedCornerShape(12.dp)
                         )
+                        .clickable(
+                            enabled = productImageUploadState.isIdle()
+                        ){
+                            if (!productImageUploadState.isLoading()){
+                                imagePickerLauncher.launch("image/*")
+                            }
+                        }
                         .background(SurfaceLight),
                     contentAlignment = Alignment.Center
                 ) {
-                    Icon(
-                        modifier = Modifier.size(24.dp),
-                        painter = painterResource(Resources.Icon.Plus),
-                        contentDescription = "Add icon",
-                        tint = IconPrimary
+                    productImageUploadState.DisplayResult(
+                        onIdle = {
+                            Icon(
+                                modifier = Modifier.size(24.dp),
+                                painter = painterResource(Resources.Icon.Plus),
+                                contentDescription = "Add icon",
+                                tint = IconPrimary
+                            )
+                        },
+                        onLoading = {
+                            LoadingCard(modifier = Modifier.fillMaxSize())
+                        },
+                        onSuccess = {
+                            Box(
+                                modifier = Modifier.fillMaxSize(),
+                                contentAlignment = Alignment.TopEnd
+                            ) {
+                                AsyncImage(
+                                    model = ImageRequest.Builder(
+                                        context
+                                    ).data(screenState.productImage)
+                                        .crossfade(enable = true)
+                                        .build(),
+                                    contentDescription = "Product image",
+                                    modifier = Modifier.matchParentSize(),
+                                    contentScale = ContentScale.Crop
+                                )
+                                Box(
+                                    modifier = Modifier
+                                        .padding(
+                                            top = 12.dp,
+                                            end = 12.dp
+                                        )
+                                        .clip(RoundedCornerShape(6.dp))
+                                        .background(ButtonPrimary)
+                                        .clickable {
+                                            viewModel.deleteProductImageFromStorage { isSuccess, message ->
+                                               showToast = message
+                                            }
+                                        }
+                                        .padding(12.dp),
+                                    contentAlignment = Alignment.Center
+                                ){
+                                    Icon(
+                                        modifier = Modifier.size(24.dp),
+                                        painter = painterResource(Resources.Icon.Delete),
+                                        contentDescription = "Delete icon",
+                                        tint = IconPrimary
+                                    )
+                                }
+                            }
+                        },
+                        onError = { message ->
+                            Column(
+                                modifier = Modifier.fillMaxSize(),
+                                verticalArrangement = Arrangement.Center,
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                ErrorCard(message = message)
+                                Spacer(modifier = Modifier.height(12.dp))
+
+                                TextButton(
+                                    onClick = {
+                                        viewModel.updateImageState(RequestState.Idle)
+                                    }
+                                ) {
+                                    Text(
+                                        text = "Try again",
+                                        fontSize = FontSize.SMALL,
+                                        color = TextSecondary
+                                    )
+                                }
+                            }
+                        }
                     )
                 }
 
                 BurgerTextField(
-                    value = "",
-                    onValueChange = {},
+                    value = screenState.title,
+                    onValueChange = viewModel::updateTitle,
                     placeholder = "Title"
                 )
                 BurgerTextField(
                     modifier = Modifier.height(120.dp),
-                    value = "",
-                    onValueChange = {},
+                    value = screenState.description,
+                    onValueChange = viewModel::updateDescription,
                     placeholder = "Description",
                     expanded = true
                 )
                 BurgerSelectTextField(
                     modifier = Modifier.fillMaxWidth(),
-                    text = selectedCategory?.title ?: "",
-                    onClick = { showCategoryDialog = true},
-                    placeholder = " Select Category"
+                    text = screenState.selectedCategory?.title ?: "",
+                    onClick = viewModel::onCategoryFieldClick,
+                    placeholder = "Select Category"
                 )
                 BurgerTextField(
-                    value = "",
-                    onValueChange = {},
+                    value = "${screenState.energyValue ?: ""}",
+                    onValueChange = { viewModel.updateEnergyValue(it.toIntOrNull() ?: 0)},
                     placeholder = "Energy Value",
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Number
@@ -167,21 +284,26 @@ fun ManageProductScreen(
                 )
                 BurgerTextField(
                     modifier = Modifier.height(80.dp),
-                    value = "",
-                    onValueChange = {},
+                    value = screenState.allergyAdvice,
+                    onValueChange = viewModel::updateAllergyAdvice,
                     placeholder = "Allergy Advice",
                     expanded = true,
                 )
                 BurgerTextField(
                     modifier = Modifier.height(80.dp),
-                    value = "",
-                    onValueChange = {},
+                    value = screenState.ingredients,
+                    onValueChange = viewModel::updateIngredients,
                     expanded = true,
                     placeholder = "Ingredients"
                 )
                 BurgerTextField(
-                    value = "",
-                    onValueChange = {},
+                    value = if (screenState.price == 0.0) ""
+                            else "${screenState.price}",
+                    onValueChange = {value ->
+                        if (value.isEmpty() || value.toDoubleOrNull() != null){
+                            viewModel.updatePrice(value.toDoubleOrNull() ?: 0.0)
+                        }
+                    },
                     placeholder = "Price",
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Number
@@ -193,8 +315,10 @@ fun ManageProductScreen(
                 text = if (id == null) "Add New Product" else "Update Product",
                 icon = if (id == null) painterResource(Resources.Icon.Plus)
                 else painterResource(Resources.Icon.Checkmark),
-                enabled = false,
-                onClick = {}
+                enabled = isFormValid && !createProductState.isLoading(),
+                onClick = {
+                    viewModel.createNewProduct()
+                }
             )
         }
 
