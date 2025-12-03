@@ -21,6 +21,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -81,6 +83,8 @@ fun ManageProductScreen(
     var showToast by remember { mutableStateOf("") }
     val isFormValid = viewModel.isFormValid
     val createProductState by viewModel.createProductState.collectAsState()
+    var dropdownMenuOpened by remember { mutableStateOf(false) }
+    val deleteProductState by viewModel.deleteProductState.collectAsState()
 
     MessageUtils.ShowToast(message = showToast)
     val context = LocalContext.current
@@ -102,6 +106,17 @@ fun ManageProductScreen(
         }
         if (createProductState.isError()) {
             showToast = createProductState.getErrorMessage()
+        }
+    }
+
+    LaunchedEffect(deleteProductState) {
+        if (deleteProductState.isSuccess()){
+            showToast = "Product deleted successfully!"
+            navigateBack()
+            viewModel.resetDeleteProductState()
+        }
+        if (deleteProductState.isError()){
+            showToast = deleteProductState.getErrorMessage()
         }
     }
 
@@ -134,6 +149,44 @@ fun ManageProductScreen(
                             contentDescription = "Back arrow icon",
                             tint = IconPrimary
                         )
+                    }
+                },
+                actions = {
+                    id.takeIf { it != null }?.let {
+                        Box {
+                            IconButton(
+                                onClick = { dropdownMenuOpened = true}
+                            ) {
+                                Icon(
+                                    painter = painterResource(Resources.Icon.VerticalMenu),
+                                    contentDescription = "Vertical menu icon",
+                                    tint = IconPrimary
+                                )
+                            }
+                            DropdownMenu(
+                                expanded = dropdownMenuOpened,
+                                onDismissRequest = { dropdownMenuOpened = false}
+                            ) {
+                                DropdownMenuItem(
+                                    leadingIcon = {
+                                        Icon(
+                                            modifier = Modifier.size(14.dp),
+                                            painter = painterResource(Resources.Icon.Delete),
+                                            contentDescription = "Delete icon",
+                                            tint = IconPrimary
+                                        )
+                                    },
+                                    text = { Text(text = "Delete", color = TextPrimary)
+                                    },
+                                    onClick = {
+                                        dropdownMenuOpened = false
+                                        viewModel.deleteProduct(
+                                            productId = screenState.id
+                                        )
+                                    }
+                                )
+                            }
+                        }
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -317,7 +370,11 @@ fun ManageProductScreen(
                 else painterResource(Resources.Icon.Checkmark),
                 enabled = isFormValid && !createProductState.isLoading(),
                 onClick = {
-                    viewModel.createNewProduct()
+                    if (id != null){
+                        viewModel.updateProductDetails()
+                    } else {
+                        viewModel.createNewProduct()
+                    }
                 }
             )
         }

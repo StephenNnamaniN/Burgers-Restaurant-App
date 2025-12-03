@@ -23,6 +23,7 @@ class AdminRepoImpl(): AdminRepository {
     private fun DocumentSnapshot.toProduct(): Product {
         return Product(
                 id = id,
+                createdAt = getLong("createdAt") ?: 0L,
                 title = getString("title").orEmpty(),
                 description = getString("description").orEmpty(),
                 category = getString("category").orEmpty(),
@@ -66,7 +67,7 @@ class AdminRepoImpl(): AdminRepository {
         Firebase.firestore
             .collection("products")
             .document(product.id)
-            .set(product)
+            .set(product.copy(title = product.title.lowercase()))
             .await()
     }
 
@@ -100,7 +101,8 @@ class AdminRepoImpl(): AdminRepository {
                         val products = queryDocumentSnapshots.documents.map { documentSnapshot ->
                             documentSnapshot.toProduct()
                         }
-                        send(RequestState.Success(products))
+                        send(RequestState.Success(products.map
+                            { it.copy(title = it.title.uppercase())}))
                     }
             } else {
                 send(RequestState.Error("User is not available"))
@@ -119,12 +121,73 @@ class AdminRepoImpl(): AdminRepository {
                 .await()
             if (productDocRef.exists()) {
                 val product = productDocRef.toProduct()
-                RequestState.Success(product)
+                RequestState.Success(product.copy(title = product.title.uppercase()))
             } else {
                 RequestState.Error("Product not found.")
             }
         } catch (e: Exception){
             RequestState.Error("Error reading selected product: ${e.message}")
+        }
+    }
+
+    override suspend fun updateProduct(product: Product): Result<Unit> {
+        return try {
+            val database = Firebase.firestore
+            val productCollection = database.collection("products")
+            val docRef = productCollection.document(product.id)
+            docRef.set(product.copy(title = product.title.lowercase())).await()
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(
+                IllegalStateException("Error while updating product: ${e.message}")
+            )
+        }
+    }
+
+    override suspend fun deleteProduct(productId: String): Result<Unit> {
+        return try {
+            val database = Firebase.firestore
+            val productCollection = database.collection("products")
+            val docRef = productCollection.document(productId)
+            docRef.delete().await()
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(
+                IllegalStateException("Error while deleting product: ${e.message}")
+            )
+        }
+    }
+
+    override fun searchProductByTitle(
+        searchQuery: String
+    ): Flow<RequestState<List<Product>>>  = channelFlow {
+        try {
+            val collectionRef = Firebase.firestore.collection("products")
+            if (searchQuery.isBlank()){
+                send(RequestState.Success(emptyList()))
+                return@channelFlow
+            }
+            collectionRef
+//                .orderBy("title", Query.Direction.ASCENDING)
+//                .startAt(searchQuery)
+//                .endAt(searchQuery + "\uf8ff")
+//                .limit(10)
+                .snapshots()
+                .collectLatest { queryDocumentSnapshots ->
+                    val product = queryDocumentSnapshots.documents.map { documentSnapshot ->
+                        documentSnapshot.toProduct()
+                    }
+                    send(RequestState.Success(
+                        product.filter {
+                            it.title.contains(searchQuery)
+                        }
+                        .map { it.copy(title = it.title.uppercase()) }
+                    ))
+                }
+        }catch (e: Exception) {
+            send(
+                RequestState.Error("Error while searching products: ${e.message}")
+            )
         }
     }
 }
