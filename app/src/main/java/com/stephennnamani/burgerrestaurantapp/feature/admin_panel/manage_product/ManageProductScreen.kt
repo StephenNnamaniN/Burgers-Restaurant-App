@@ -10,6 +10,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -27,6 +28,8 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
@@ -44,6 +47,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -66,6 +70,8 @@ import com.stephennnamani.burgerrestaurantapp.ui.theme.FontSize
 import com.stephennnamani.burgerrestaurantapp.ui.theme.IconPrimary
 import com.stephennnamani.burgerrestaurantapp.ui.theme.Resources
 import com.stephennnamani.burgerrestaurantapp.ui.theme.Surface
+import com.stephennnamani.burgerrestaurantapp.ui.theme.SurfaceBrand
+import com.stephennnamani.burgerrestaurantapp.ui.theme.SurfaceDark
 import com.stephennnamani.burgerrestaurantapp.ui.theme.SurfaceLight
 import com.stephennnamani.burgerrestaurantapp.ui.theme.TextPrimary
 import com.stephennnamani.burgerrestaurantapp.ui.theme.TextSecondary
@@ -362,6 +368,83 @@ fun ManageProductScreen(
                         keyboardType = KeyboardType.Number
                     )
                 )
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(
+                            modifier = Modifier.padding(start = 12.dp),
+                            text = "New",
+                            fontSize = FontSize.REGULAR,
+                            color = TextPrimary
+                        )
+                        Switch(
+                            checked = screenState.isNew,
+                            onCheckedChange = viewModel::updateIsNew,
+                            colors = SwitchDefaults.colors(
+                                checkedTrackColor = SurfaceBrand,
+                                uncheckedTrackColor = SurfaceDark,
+                                checkedThumbColor = Surface,
+                                uncheckedThumbColor = Surface,
+                                checkedBorderColor = SurfaceBrand,
+                                uncheckedBorderColor = SurfaceDark
+                            )
+                        )
+                    }
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(
+                            modifier = Modifier.padding(start = 12.dp),
+                            text = "Popular",
+                            fontSize = FontSize.REGULAR,
+                            color = TextPrimary
+                        )
+                        Switch(
+                            checked = screenState.isPopular,
+                            onCheckedChange = viewModel::updateIsPopular,
+                            colors = SwitchDefaults.colors(
+                                checkedTrackColor = SurfaceBrand,
+                                uncheckedTrackColor = SurfaceDark,
+                                checkedThumbColor = Surface,
+                                uncheckedThumbColor = Surface,
+                                checkedBorderColor = SurfaceBrand,
+                                uncheckedBorderColor = SurfaceDark
+                            )
+                        )
+                    }
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(
+                            modifier = Modifier.padding(start = 12.dp),
+                            text = "Discounted",
+                            fontSize = FontSize.REGULAR,
+                            color = TextPrimary
+                        )
+                        Switch(
+                            checked = screenState.isDiscounted,
+                            onCheckedChange = viewModel::updateIsDiscounted,
+                            colors = SwitchDefaults.colors(
+                                checkedTrackColor = SurfaceBrand,
+                                uncheckedTrackColor = SurfaceDark,
+                                checkedThumbColor = Surface,
+                                uncheckedThumbColor = Surface,
+                                checkedBorderColor = SurfaceBrand,
+                                uncheckedBorderColor = SurfaceDark
+                            )
+                        )
+                    }
+                }
                 Spacer(modifier = Modifier.height(24.dp))
             }
             PrimaryButton(

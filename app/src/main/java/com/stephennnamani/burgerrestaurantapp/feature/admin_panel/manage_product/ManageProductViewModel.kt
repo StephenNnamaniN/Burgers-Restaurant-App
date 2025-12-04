@@ -27,7 +27,10 @@ data class ManageProductState(
     val energyValue: Int? = null,
     val allergyAdvice: String = "",
     val ingredients: String = "",
-    val price: Double = 0.0
+    val price: Double = 0.0,
+    val isNew: Boolean = false,
+    val isPopular: Boolean = false,
+    val isDiscounted: Boolean = false
 )
 
 class ManageProductViewModel(
@@ -75,7 +78,11 @@ class ManageProductViewModel(
                             allergyAdvice = product.allergyAdvice,
                             ingredients = product.ingredients,
                             energyValue = product.energyValue,
-                            price = product.price
+                            price = product.price,
+                            isNew = product.isNew,
+                            isPopular = product.isPopular,
+                            isDiscounted = product.isDiscounted
+
                         )
                         updateImageState(RequestState.Success(Unit))
                     }
@@ -134,6 +141,18 @@ class ManageProductViewModel(
     }
     fun updateProductImage(value: String) {
         screenState = screenState.copy(productImage = value)
+    }
+
+    fun updateIsNew(value: Boolean){
+        screenState = screenState.copy(isNew = value)
+    }
+
+    fun updateIsPopular(value: Boolean){
+        screenState = screenState.copy(isPopular = value)
+    }
+
+    fun updateIsDiscounted(value: Boolean){
+        screenState = screenState.copy(isDiscounted = value)
     }
 
     fun uploadProductImageToStorage(imageUri: Uri?) {
@@ -195,7 +214,10 @@ class ManageProductViewModel(
                     energyValue = screenState.energyValue,
                     ingredients = screenState.ingredients,
                     price = screenState.price,
-                    productImage = screenState.productImage
+                    productImage = screenState.productImage,
+                    isNew = screenState.isNew,
+                    isPopular = screenState.isPopular,
+                    isDiscounted = screenState.isDiscounted
                 )
                 adminRepository.createNewProduct(productToCreate)
                 _createProductState.value = RequestState.Success(Unit)
@@ -228,7 +250,10 @@ class ManageProductViewModel(
                 allergyAdvice = screenState.allergyAdvice,
                 ingredients = screenState.ingredients,
                 energyValue = screenState.energyValue,
-                price = screenState.price
+                price = screenState.price,
+                isNew = screenState.isNew,
+                isPopular = screenState.isPopular,
+                isDiscounted = screenState.isDiscounted
             )
             val result = adminRepository.updateProduct(updatedProduct)
 

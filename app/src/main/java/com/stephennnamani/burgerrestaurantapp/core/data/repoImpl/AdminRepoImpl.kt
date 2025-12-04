@@ -31,7 +31,10 @@ class AdminRepoImpl(): AdminRepository {
                 energyValue = getLong("energyValue")?.toInt(),
                 ingredients = getString("ingredients").orEmpty(),
                 price = getDouble("price") ?: 0.0,
-                productImage = getString("productImage").orEmpty()
+                productImage = getString("productImage").orEmpty(),
+                isNew = getBoolean("new") ?: false,
+                isPopular = getBoolean("popular") ?: false,
+                isDiscounted = getBoolean("discounted") ?: false
         )
     }
     override fun getCurrentUserId() = Firebase.auth.currentUser?.uid

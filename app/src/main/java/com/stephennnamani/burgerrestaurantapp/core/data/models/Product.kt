@@ -16,7 +16,10 @@ data class Product (
     val energyValue: Int?,
     val ingredients: String,
     val price: Double,
-    val productImage: String
+    val productImage: String,
+    val isPopular: Boolean = false,
+    val isNew: Boolean = false,
+    val isDiscounted: Boolean = false,
 )
 
 enum class ProductCategory(
