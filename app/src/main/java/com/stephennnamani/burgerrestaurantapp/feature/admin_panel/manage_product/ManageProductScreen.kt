@@ -47,14 +47,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
-import com.stephennnamani.burgerrestaurantapp.core.data.models.ProductCategory
 import com.stephennnamani.burgerrestaurantapp.feature.component.BurgerSelectTextField
 import com.stephennnamani.burgerrestaurantapp.feature.component.BurgerTextField
 import com.stephennnamani.burgerrestaurantapp.feature.component.ErrorCard

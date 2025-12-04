@@ -15,7 +15,7 @@ interface CustomerRepository {
         onError: (String) -> Unit
     )
 
-    suspend fun readCustomerFlow(): Flow<RequestState<Customer>>
+    fun readCustomerFlow(): Flow<RequestState<Customer>>
     suspend fun updateCustomer(
         customer: Customer,
         onSuccess: () -> Unit,

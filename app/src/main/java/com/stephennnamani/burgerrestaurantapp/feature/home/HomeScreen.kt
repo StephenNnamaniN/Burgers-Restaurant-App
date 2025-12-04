@@ -1,5 +1,6 @@
 package com.stephennnamani.burgerrestaurantapp.feature.home
 
+import android.content.res.Resources
 import android.widget.Toast
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.animateColorAsState
@@ -23,6 +24,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -67,6 +69,7 @@ fun HomeScreen(
     val currentRoute = navController.currentBackStackEntryAsState()
 
     val viewModel = koinViewModel<HomeViewModel>()
+    val isAdmin by viewModel.isAdmin.collectAsState()
     val context = LocalContext.current
 
     val selectedDestination by remember {
@@ -122,7 +125,8 @@ fun HomeScreen(
                     }
                 )
             },
-            onAdminPanelClick = navigateToAdminPanel
+            onAdminPanelClick = navigateToAdminPanel,
+            isAdmin = isAdmin
         )
         Box(
             modifier = Modifier
@@ -229,6 +233,6 @@ fun HomeScreen(
 
 }
 fun getScreenWidth(): Float {
-    return android.content.res.Resources.getSystem().displayMetrics.widthPixels /
-            android.content.res.Resources.getSystem().displayMetrics.density
+    return Resources.getSystem().displayMetrics.widthPixels /
+            Resources.getSystem().displayMetrics.density
 }

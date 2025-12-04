@@ -93,7 +93,7 @@ class ManageProductViewModel(
         }
     }
     private fun mapCategory(categoryTitle: String): ProductCategory? {
-        return ProductCategory.entries.firstOrNull() {
+        return ProductCategory.entries.firstOrNull{
             it.title.equals(categoryTitle, ignoreCase = true)
         }
     }
