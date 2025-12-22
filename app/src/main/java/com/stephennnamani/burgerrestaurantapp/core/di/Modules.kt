@@ -9,13 +9,16 @@ import com.stephennnamani.burgerrestaurantapp.core.data.domain.AdminRepository
 import com.stephennnamani.burgerrestaurantapp.core.data.domain.CountryRepository
 import com.stephennnamani.burgerrestaurantapp.core.data.domain.CountryRepositoryImpl
 import com.stephennnamani.burgerrestaurantapp.core.data.domain.CustomerRepository
+import com.stephennnamani.burgerrestaurantapp.core.data.domain.ProductRepository
 import com.stephennnamani.burgerrestaurantapp.core.data.remote.RestCountriesApi
 import com.stephennnamani.burgerrestaurantapp.core.data.repoImpl.AdminRepoImpl
 import com.stephennnamani.burgerrestaurantapp.core.data.repoImpl.CustomerRepoImpl
+import com.stephennnamani.burgerrestaurantapp.core.data.repoImpl.ProductRepoImpl
 import com.stephennnamani.burgerrestaurantapp.feature.admin_panel.AdminPanelViewModel
 import com.stephennnamani.burgerrestaurantapp.feature.admin_panel.manage_product.ManageProductViewModel
 import com.stephennnamani.burgerrestaurantapp.feature.auth.AuthViewModel
 import com.stephennnamani.burgerrestaurantapp.feature.home.HomeViewModel
+import com.stephennnamani.burgerrestaurantapp.feature.home.product_overview.ProductOverviewViewModel
 import com.stephennnamani.burgerrestaurantapp.feature.profile.ProfileViewModel
 import okhttp3.OkHttpClient
 import org.koin.android.ext.koin.androidContext
@@ -48,12 +51,14 @@ val appModule = module {
 
     single<CustomerRepository> { CustomerRepoImpl() }
     single<AdminRepository> { AdminRepoImpl() }
+    single<ProductRepository> { ProductRepoImpl() }
 
     viewModel { AuthViewModel(get()) }
     viewModel { HomeViewModel(get()) }
     viewModel { ProfileViewModel(get(), get()) }
     viewModel { ManageProductViewModel(get(), get()) }
     viewModel { AdminPanelViewModel(get()) }
+    viewModel { ProductOverviewViewModel(get()) }
 
     single {
         GoogleUiClient(
