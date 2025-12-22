@@ -49,6 +49,7 @@ import com.stephennnamani.burgerrestaurantapp.feature.home.domain.BottomBarDesti
 import com.stephennnamani.burgerrestaurantapp.feature.home.domain.CustomDrawerState
 import com.stephennnamani.burgerrestaurantapp.feature.home.domain.isOpened
 import com.stephennnamani.burgerrestaurantapp.feature.home.domain.reverse
+import com.stephennnamani.burgerrestaurantapp.feature.home.product_overview.ProductOverviewScreen
 import com.stephennnamani.burgerrestaurantapp.feature.nav.Screens
 import com.stephennnamani.burgerrestaurantapp.ui.theme.BrandBrown
 import com.stephennnamani.burgerrestaurantapp.ui.theme.FontSize
@@ -201,7 +202,11 @@ fun HomeScreen(
                         navController = navController,
                         startDestination = Screens.ProductOverviewScreen
                     ){
-                        composable<Screens.ProductOverviewScreen> {}
+                        composable<Screens.ProductOverviewScreen> {
+                            ProductOverviewScreen (
+                                onProductClick = {}
+                            )
+                        }
                         composable<Screens.Cart> {}
                         composable<Screens.Notifications> {}
                         composable<Screens.Categories> {}
