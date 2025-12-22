@@ -163,7 +163,7 @@ fun ProductOverviewScreen(
             }
         } else {
             item {
-                SectionHeader(title = "popular products")
+                SectionHeader(title = "Popular products")
             }
             item {
                 popularProducts.DisplayResult(

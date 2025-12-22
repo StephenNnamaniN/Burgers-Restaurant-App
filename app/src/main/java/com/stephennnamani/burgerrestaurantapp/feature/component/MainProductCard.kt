@@ -2,6 +2,10 @@ package com.stephennnamani.burgerrestaurantapp.feature.component
 
 
 import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -23,6 +27,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -48,6 +53,9 @@ import com.stephennnamani.burgerrestaurantapp.ui.theme.FontSize
 import com.stephennnamani.burgerrestaurantapp.ui.theme.Resources
 import com.stephennnamani.burgerrestaurantapp.ui.theme.TextWhite
 import com.stephennnamani.burgerrestaurantapp.ui.theme.oswaldVariableFont
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @Composable
 fun MainProductCard(
@@ -65,6 +73,42 @@ fun MainProductCard(
     val imageOffsetX = remember { Animatable(-70f) }
     val imageAlpha= remember { Animatable(0.95f) }
     val imageScale = remember { Animatable(0.98f) }
+
+    LaunchedEffect(paused, imageUrl) {
+        if (paused) {
+            imageOffsetX.snapTo(-25f)
+            imageAlpha.snapTo(1f)
+            imageScale.snapTo(1f)
+            return@LaunchedEffect
+        }
+        while (true) {
+            coroutineScope {
+                launch {
+                    imageOffsetX.animateTo(
+                        targetValue = -25f,
+                        animationSpec = tween(900, easing = FastOutSlowInEasing)
+                    )
+                }
+                launch {
+                    imageAlpha.animateTo(1f, animationSpec = tween(350))
+                }
+            }
+
+            imageScale.snapTo(1.02f)
+            imageScale.animateTo(
+                targetValue = 1f,
+                animationSpec = spring(
+                    dampingRatio = Spring.DampingRatioMediumBouncy,
+                    stiffness = Spring.StiffnessLow
+                )
+            )
+            delay(5000)
+
+            imageOffsetX.snapTo(90f)
+            imageAlpha.snapTo(0.6f)
+            imageScale.snapTo(0.98f)
+        }
+    }
 
     Card(
         modifier = Modifier
