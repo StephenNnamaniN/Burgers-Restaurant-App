@@ -15,9 +15,12 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.util.UUID
-
-data class ManageProductState(
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
+@OptIn(ExperimentalTime::class)
+data class ManageProductState (
     val id: String = UUID.randomUUID().toString(),
+    val createdAt: Long = Clock.System.now().toEpochMilliseconds(),
     val title: String = "",
     val description: String = "",
     val selectedCategory: ProductCategory? = null,
@@ -207,6 +210,7 @@ class ManageProductViewModel(
 
                 val productToCreate = Product(
                     id = screenState.id,
+                    createdAt = screenState.createdAt,
                     title = screenState.title,
                     description = screenState.description,
                     category = screenState.selectedCategory!!.title,
@@ -243,6 +247,8 @@ class ManageProductViewModel(
             }
 
             val updatedProduct = base.copy(
+                id = screenState.id,
+                createdAt = screenState.createdAt,
                 title = screenState.title,
                 description = screenState.description,
                 productImage = screenState.productImage,

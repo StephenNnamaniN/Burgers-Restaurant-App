@@ -3,7 +3,6 @@ package com.stephennnamani.burgerrestaurantapp.feature.home.component
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -22,13 +21,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseAuthException
 import com.stephennnamani.burgerrestaurantapp.R
 import com.stephennnamani.burgerrestaurantapp.feature.home.domain.DrawerItem
-import com.stephennnamani.burgerrestaurantapp.ui.theme.BrandYellow
 import com.stephennnamani.burgerrestaurantapp.ui.theme.FontSize
 import com.stephennnamani.burgerrestaurantapp.ui.theme.TextBrand
-import com.stephennnamani.burgerrestaurantapp.ui.theme.TextWhite
 import com.stephennnamani.burgerrestaurantapp.ui.theme.oswaldVariableFont
 
 @Composable
