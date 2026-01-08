@@ -1,5 +1,6 @@
 package com.stephennnamani.burgerrestaurantapp.feature.product_details
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.stephennnamani.burgerrestaurantapp.core.data.domain.ProductRepository
@@ -12,13 +13,18 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class ProductDetailsViewModel(
-    private val productRepository: ProductRepository
+    private val productRepository: ProductRepository,
+    private val savedStateHandle: SavedStateHandle
 ): ViewModel() {
     private val _productState = MutableStateFlow<RequestState<Product>>(RequestState.Loading)
     val productState: StateFlow<RequestState<Product>> = _productState
 
     private val _quantity = MutableStateFlow(1)
     val quantity: StateFlow<Int> = _quantity
+
+    init {
+        load(savedStateHandle.get<String>("id") ?: "")
+    }
 
     fun load(productId: String) {
         viewModelScope.launch {

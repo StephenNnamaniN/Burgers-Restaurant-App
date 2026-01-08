@@ -23,6 +23,7 @@ object Resources {
         val Dollar = R.drawable.dollar
         val MapPin = R.drawable.map_pin
         val Close = R.drawable.close
+        val Pound = R.drawable.pound
         val Book = R.drawable.book
         val VerticalMenu = R.drawable.vertical_menu
         val Delete = R.drawable.delete
