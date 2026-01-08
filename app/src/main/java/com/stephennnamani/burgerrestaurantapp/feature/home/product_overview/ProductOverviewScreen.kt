@@ -10,10 +10,8 @@ import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
@@ -72,34 +70,21 @@ fun ProductOverviewScreen(
                 transitionSpec = {
                     fadeIn(tween(500)) togetherWith fadeOut(tween(500))
                 }
-            ){ _ ->
+            ) { _ ->
                 heroProduct?.let { product ->
                     MainProductCard(
                         title = product.title,
                         energyValue = "${product.energyValue ?: 0}kcal",
                         price = "£${"%.2f".format(product.price)}",
                         imageUrl = product.productImage,
-                        paused = heroPaused,
+                        paused = heroPaused
                     )
                 } ?: LoadingCard(modifier = Modifier.fillMaxSize())
-
             }
         }
 
         // Category row
-        item {
-            Text(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .alpha(Alpha.HALF),
-                text = "Our Menu",
-                fontSize = FontSize.EXTRA_REGULAR,
-                color = TextPrimary,
-                textAlign = TextAlign.Center
-            )
-            Spacer(modifier = Modifier.height(24.dp))
-        }
-
+        item { SectionHeader(title = "Our Menu")}
         item {
             LazyRow(
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
@@ -116,18 +101,7 @@ fun ProductOverviewScreen(
         }
 
         if (selectedCategory != null) {
-            item {
-                Text(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .alpha(Alpha.HALF),
-                    text = selectedCategory!!.title,
-                    fontSize = FontSize.EXTRA_REGULAR,
-                    color = TextPrimary,
-                    textAlign = TextAlign.Center
-                )
-            }
-
+            item { SectionHeader(title = selectedCategory!!.title)}
             item {
                 categoryProducts.DisplayResult(
                     onLoading = { LoadingCard(modifier = Modifier.fillMaxSize())},
@@ -135,7 +109,7 @@ fun ProductOverviewScreen(
                         InfoCard(
                             image = Resources.Icon.Dog,
                             title = "Oops!",
-                            subtitle = message
+                            subtitle = message,
                         )
                     },
                     onSuccess = { list ->
@@ -145,8 +119,8 @@ fun ProductOverviewScreen(
                         if (products.isEmpty()) {
                             InfoCard(
                                 image = Resources.Icon.Dog,
-                                title = "Sorry, nothing here",
-                                subtitle = "No products found in this category."
+                                title = "Sorry, Nothing here.",
+                                subtitle = "No products found in this category",
                             )
                         } else {
                             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -162,9 +136,7 @@ fun ProductOverviewScreen(
                 )
             }
         } else {
-            item {
-                SectionHeader(title = "Popular products")
-            }
+            item { SectionHeader(title = "Popular Products")}
             item {
                 popularProducts.DisplayResult(
                     onLoading = { LoadingCard(modifier = Modifier.fillMaxSize())},
@@ -172,19 +144,18 @@ fun ProductOverviewScreen(
                         InfoCard(
                             image = Resources.Icon.Dog,
                             title = "Oops!",
-                            subtitle = message
+                            subtitle = message,
                         )
                     },
-                    onSuccess = { productList ->
-                        val products = productList
+                    onSuccess = { list ->
+                        val products = list
                             .distinctBy { it.id }
                             .sortedByDescending { it.createdAt }
-                            .take(5)
                         if (products.isEmpty()) {
                             InfoCard(
                                 image = Resources.Icon.Dog,
-                                title = "Sorry, nothing here",
-                                subtitle = "No popular products yet."
+                                title = "Sorry, Nothing here.",
+                                subtitle = "No popular products found.",
                             )
                         } else {
                             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -199,9 +170,7 @@ fun ProductOverviewScreen(
                     }
                 )
             }
-            item {
-                SectionHeader(title = "Discounted products")
-            }
+            item { SectionHeader(title = "Discounted Products")}
             item {
                 discountedProducts.DisplayResult(
                     onLoading = { LoadingCard(modifier = Modifier.fillMaxSize())},
@@ -209,19 +178,18 @@ fun ProductOverviewScreen(
                         InfoCard(
                             image = Resources.Icon.Dog,
                             title = "Oops!",
-                            subtitle = message
+                            subtitle = message,
                         )
                     },
-                    onSuccess = { productList ->
-                        val products = productList
+                    onSuccess = { list ->
+                        val products = list
                             .distinctBy { it.id }
                             .sortedByDescending { it.createdAt }
-                            .take(5)
                         if (products.isEmpty()) {
                             InfoCard(
                                 image = Resources.Icon.Dog,
-                                title = "Sorry, nothing here",
-                                subtitle = "No discounted products yet."
+                                title = "Sorry, Nothing here.",
+                                subtitle = "No discounted products found.",
                             )
                         } else {
                             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -239,8 +207,9 @@ fun ProductOverviewScreen(
         }
     }
 }
+
 @Composable
-private fun SectionHeader(title: String) {
+private fun SectionHeader(title: String){
     Text(
         modifier = Modifier
             .fillMaxWidth()

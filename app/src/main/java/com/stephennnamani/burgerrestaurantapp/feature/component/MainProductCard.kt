@@ -81,7 +81,7 @@ fun MainProductCard(
             imageScale.snapTo(1f)
             return@LaunchedEffect
         }
-        while (true) {
+        while (true){
             coroutineScope {
                 launch {
                     imageOffsetX.animateTo(
@@ -94,7 +94,7 @@ fun MainProductCard(
                 }
             }
 
-            imageScale.snapTo(1.02f)
+            imageScale.snapTo(1.05f)
             imageScale.animateTo(
                 targetValue = 1f,
                 animationSpec = spring(
@@ -102,6 +102,7 @@ fun MainProductCard(
                     stiffness = Spring.StiffnessLow
                 )
             )
+
             delay(5000)
 
             imageOffsetX.snapTo(90f)

@@ -47,6 +47,18 @@ class ProductOverviewViewModel(
 
     private  val _selectedCategory = MutableStateFlow<ProductCategory?>(null)
     val selectedCategory = _selectedCategory.asStateFlow()
+    private val heroCandidate: StateFlow<List<Product>> =
+        newProducts.map { state ->
+            state.getSuccessDataOrNull()
+                ?.sortedByDescending { it.createdAt }
+                ?.take(3)
+                ?: emptyList()
+        }
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(5000),
+                initialValue = emptyList()
+            )
 
     val heroPaused = selectedCategory
         .map { it != null }
@@ -55,20 +67,6 @@ class ProductOverviewViewModel(
             started = SharingStarted.WhileSubscribed(5000),
             initialValue = true
         )
-
-    private val heroCandidate:  StateFlow<List<Product>> =
-        newProducts.map { state ->
-            state.getSuccessDataOrNull()
-                ?.sortedByDescending { it.createdAt }
-                ?.take(3)
-                ?: emptyList()
-        }
-        .stateIn(
-             scope = viewModelScope,
-             started = SharingStarted.WhileSubscribed(5000),
-             initialValue = emptyList()
-        )
-
     private val heroIndex = MutableStateFlow(0)
 
     val heroProduct: StateFlow<Product?> =
@@ -88,18 +86,19 @@ class ProductOverviewViewModel(
                     heroIndex.value = 0
                     if (paused || list.size <= 1) return@collectLatest
 
-                    while (isActive && !heroPaused.value) {
+                    while (isActive && !heroPaused.value){
                         delay(5000)
                         heroIndex.value = (heroIndex.value + 1) % list.size
                     }
                 }
+
         }
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val categoryProducts = selectedCategory
         .flatMapLatest { category ->
-            if (category == null) {
+            if (category == null){
                 flowOf(RequestState.Idle)
             } else {
                 productRepository.readProductsByCategory(category.title)
