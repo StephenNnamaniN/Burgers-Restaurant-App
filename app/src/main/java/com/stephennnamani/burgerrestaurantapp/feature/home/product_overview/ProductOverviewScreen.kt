@@ -77,7 +77,8 @@ fun ProductOverviewScreen(
                         energyValue = "${product.energyValue ?: 0}kcal",
                         price = "£${"%.2f".format(product.price)}",
                         imageUrl = product.productImage,
-                        paused = heroPaused
+                        paused = heroPaused,
+                        onClick = { onProductClick(product.id) },
                     )
                 } ?: LoadingCard(modifier = Modifier.fillMaxSize())
             }

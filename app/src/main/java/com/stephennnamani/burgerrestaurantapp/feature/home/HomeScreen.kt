@@ -64,7 +64,8 @@ import org.koin.androidx.compose.koinViewModel
 fun HomeScreen(
     navigateToAuth: () -> Unit,
     navigateToProfile: () -> Unit,
-    navigateToAdminPanel: () -> Unit
+    navigateToAdminPanel: () -> Unit,
+    navigateToDetails: (String) -> Unit
 ){
     val navController = rememberNavController()
     val currentRoute = navController.currentBackStackEntryAsState()
@@ -204,7 +205,7 @@ fun HomeScreen(
                     ){
                         composable<Screens.ProductOverviewScreen> {
                             ProductOverviewScreen (
-                                onProductClick = {}
+                                onProductClick = navigateToDetails
                             )
                         }
                         composable<Screens.Cart> {}

@@ -9,6 +9,7 @@ import com.stephennnamani.burgerrestaurantapp.feature.admin_panel.AdminPanelScre
 import com.stephennnamani.burgerrestaurantapp.feature.admin_panel.manage_product.ManageProductScreen
 import com.stephennnamani.burgerrestaurantapp.feature.auth.AuthScreen
 import com.stephennnamani.burgerrestaurantapp.feature.home.HomeScreen
+import com.stephennnamani.burgerrestaurantapp.feature.product_details.ProductDetailsScreen
 import com.stephennnamani.burgerrestaurantapp.feature.profile.ProfileScreen
 import com.stephennnamani.burgerrestaurantapp.feature.splash.SplashScreen
 
@@ -58,6 +59,9 @@ fun BurgerNavGraph(startDestination: Screens = Screens.SplashScreen){
                 },
                 navigateToAdminPanel = {
                     navController.navigate(Screens.AdminPanel)
+                },
+                navigateToDetails = { productId ->
+                    navController.navigate(Screens.DetailsScreen(id = productId))
                 }
             )
         }
@@ -85,6 +89,14 @@ fun BurgerNavGraph(startDestination: Screens = Screens.SplashScreen){
             val id = it.toRoute<Screens.ManageProduct>().id
             ManageProductScreen(
                 id = id,
+                navigateBack = {
+                    navController.navigateUp()
+                }
+            )
+        }
+
+        composable<Screens.DetailsScreen> {
+            ProductDetailsScreen(
                 navigateBack = {
                     navController.navigateUp()
                 }

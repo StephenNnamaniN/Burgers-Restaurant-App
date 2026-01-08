@@ -36,4 +36,9 @@ sealed class Screens {
     data class ManageProduct(
         val id: String? = null
     ): Screens()
+
+    @Serializable
+    data class DetailsScreen(
+        val id: String
+    ): Screens()
 }

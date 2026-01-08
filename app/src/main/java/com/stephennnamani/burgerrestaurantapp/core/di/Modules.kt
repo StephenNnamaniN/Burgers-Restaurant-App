@@ -19,6 +19,7 @@ import com.stephennnamani.burgerrestaurantapp.feature.admin_panel.manage_product
 import com.stephennnamani.burgerrestaurantapp.feature.auth.AuthViewModel
 import com.stephennnamani.burgerrestaurantapp.feature.home.HomeViewModel
 import com.stephennnamani.burgerrestaurantapp.feature.home.product_overview.ProductOverviewViewModel
+import com.stephennnamani.burgerrestaurantapp.feature.product_details.ProductDetailsViewModel
 import com.stephennnamani.burgerrestaurantapp.feature.profile.ProfileViewModel
 import okhttp3.OkHttpClient
 import org.koin.android.ext.koin.androidContext
@@ -59,6 +60,7 @@ val appModule = module {
     viewModel { ManageProductViewModel(get(), get()) }
     viewModel { AdminPanelViewModel(get()) }
     viewModel { ProductOverviewViewModel(get()) }
+    viewModel { ProductDetailsViewModel(get()) }
 
     single {
         GoogleUiClient(
