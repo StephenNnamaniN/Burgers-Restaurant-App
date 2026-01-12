@@ -234,6 +234,7 @@ class CustomerRepoImpl: CustomerRepository {
 
     override suspend fun addToCart(
         productId: String,
+        productTitle: String,
         quantityToAdd: Int
     ): RequestState<Unit> {
         return try {
@@ -263,6 +264,7 @@ class CustomerRepoImpl: CustomerRepository {
                         mapOf(
                             "productId" to productId,
                             "quantity" to quantityToAdd,
+                            "productTitle" to productTitle,
                             "createdAt" to FieldValue.serverTimestamp(),
                             "updatedAd" to FieldValue.serverTimestamp()
                         )
@@ -273,6 +275,46 @@ class CustomerRepoImpl: CustomerRepository {
             RequestState.Success(Unit)
         } catch (e: Exception) {
             RequestState.Error("Failed to add item to cart: ${e.message}")
+        }
+    }
+
+    override suspend fun removeFromCart(
+        productId: String,
+        quantityToRemove: Int
+    ): RequestState<Unit> {
+        return try {
+            val uid = getCurrentUserId() ?: return RequestState.Error("User not available.")
+            if (productId.isBlank()) return RequestState.Error("Invalid product id.")
+            if (quantityToRemove <= 0) return RequestState.Error("Quantity must be at least 1.")
+
+            val cartDoc = Firebase.firestore
+                .collection(CUSTOMER_COLLECTION)
+                .document(uid)
+                .collection(CART_SUBCOLLECTION)
+                .document(productId)
+
+            Firebase.firestore.runTransaction { trx ->
+                val snap = trx.get(cartDoc)
+                if (!snap.exists()) return@runTransaction
+
+                val currentQty = (snap.getLong("quantity") ?: 0).toInt()
+                val newQty = currentQty - quantityToRemove
+                if (newQty <= 0 ){
+                    trx.delete(cartDoc)
+                } else {
+                    trx.update(
+                        cartDoc,
+                        mapOf(
+                            "quantity" to newQty,
+                            "updatedAd" to FieldValue.serverTimestamp()
+                        )
+                    )
+                }
+                Unit
+            }.await()
+            RequestState.Success(Unit)
+        } catch (e: Exception) {
+            RequestState.Error("Failed to remove item from cart: ${e.message}")
         }
     }
 
@@ -326,6 +368,28 @@ class CustomerRepoImpl: CustomerRepository {
             RequestState.Success(isFavDoc.exists())
         } catch (e: Exception){
             RequestState.Error("Failed to read favourite state: ${e.message}")
+        }
+    }
+
+    override fun readFavouriteIdFlow(): Flow<RequestState<Set<String>>>  = channelFlow {
+        try {
+            val uid = getCurrentUserId()
+            if (uid.isNullOrBlank()){
+                send(RequestState.Error("User not available."))
+                return@channelFlow
+            }
+            send(RequestState.Loading)
+            Firebase.firestore
+                .collection(CUSTOMER_COLLECTION)
+                .document(uid)
+                .collection(FAVOURITE_SUBCOLLECTION)
+                .snapshots()
+                .collectLatest { snapshots ->
+                    val ids = snapshots.documents.map { it.id }.toSet()
+                    send(RequestState.Success(ids))
+                }
+        } catch (e: Exception){
+            RequestState.Error("Failed to read favourites: ${e.message}")
         }
     }
 }

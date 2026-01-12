@@ -30,9 +30,17 @@ interface CustomerRepository {
     //Cart functions
     suspend fun addToCart(
         productId: String,
+        productTitle: String,
         quantityToAdd: Int
+    ): RequestState<Unit>
+
+    suspend fun removeFromCart(
+        productId: String,
+        quantityToRemove: Int
     ): RequestState<Unit>
 
     suspend fun toggleFavourite(productId: String): RequestState<Boolean>
     suspend fun isFavourite(productId: String): RequestState<Boolean>
+
+    fun readFavouriteIdFlow(): Flow<RequestState<Set<String>>>
 }

@@ -60,7 +60,7 @@ val appModule = module {
     viewModel { ManageProductViewModel(get(), get()) }
     viewModel { AdminPanelViewModel(get()) }
     viewModel { ProductOverviewViewModel(get()) }
-    viewModel { ProductDetailsViewModel(get(), get()) }
+    viewModel { ProductDetailsViewModel(get(), get(), get()) }
 
     single {
         GoogleUiClient(
