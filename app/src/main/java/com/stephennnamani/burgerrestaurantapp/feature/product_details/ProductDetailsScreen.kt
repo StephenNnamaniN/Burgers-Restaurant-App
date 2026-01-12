@@ -1,5 +1,6 @@
 package com.stephennnamani.burgerrestaurantapp.feature.product_details
 
+import android.widget.Space
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -24,6 +25,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedIconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -40,6 +42,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.util.packInts
 import coil3.compose.AsyncImage
 import coil3.compose.LocalPlatformContext
 import coil3.request.ImageRequest
@@ -56,6 +59,7 @@ import com.stephennnamani.burgerrestaurantapp.ui.theme.IconPrimary
 import com.stephennnamani.burgerrestaurantapp.ui.theme.Resources
 import com.stephennnamani.burgerrestaurantapp.ui.theme.Surface
 import com.stephennnamani.burgerrestaurantapp.ui.theme.SurfaceDark
+import com.stephennnamani.burgerrestaurantapp.ui.theme.SurfaceLight
 import com.stephennnamani.burgerrestaurantapp.ui.theme.TextPrimary
 import com.stephennnamani.burgerrestaurantapp.ui.theme.oswaldVariableFont
 import org.koin.androidx.compose.koinViewModel
@@ -66,7 +70,7 @@ fun ProductDetailsScreen(
     navigateBack: () -> Unit
 ){
     val viewModel = koinViewModel<ProductDetailsViewModel>()
-    val productState by viewModel.productState.collectAsState()
+    val productState by viewModel.product.collectAsState()
     val quantity by viewModel.quantity.collectAsState()
 
     Scaffold(
@@ -90,7 +94,14 @@ fun ProductDetailsScreen(
                         )
                     }
                 },
-                actions = {},
+                actions = {
+                    QuantityStepper(
+                        quantity = quantity,
+                        onMinusClick = viewModel::productQtyDecrement,
+                        onPlusClick = viewModel::productQtyIncrement
+                    )
+                    Spacer(modifier = Modifier.width(12.dp))
+                },
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
                     containerColor = Surface,
                     scrolledContainerColor = Surface,
@@ -134,14 +145,14 @@ fun ProductDetailsScreen(
                             ),
                         contentScale = ContentScale.Crop
                     )
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.width(8.dp))
                     LazyColumn(
                         modifier = Modifier
                             .fillMaxWidth()
                             .weight(1f),
                         contentPadding = PaddingValues(vertical = 12.dp),
                         verticalArrangement = Arrangement.spacedBy(12.dp)
-                    ){
+                    ) {
                         item {
                             ProductDetailsCard(
                                 title = product.title,
@@ -151,16 +162,16 @@ fun ProductDetailsScreen(
                                 allergyAdvice = product.allergyAdvice,
                                 ingredients = product.ingredients
                             )
-                            Spacer(modifier = Modifier.height(8.dp))
+                            Spacer(modifier = Modifier.height(12.dp))
                             DetailsBottomActions(
                                 onFavourite = viewModel::toggleFavourite,
-                                onAddToCart = viewModel::addToCart,
-                                onBuyNow = viewModel::buyNow
+                                onBuyNow = viewModel::buyNow,
+                                onAddToCart = viewModel::addToCart
                             )
                         }
                     }
                     PrimaryButton(
-                        text = "Browse for more",
+                        text = "Browse for More",
                         icon = painterResource(Resources.Icon.Book),
                         enabled = true,
                         onClick = {}
@@ -170,6 +181,7 @@ fun ProductDetailsScreen(
         )
     }
 }
+
 
 @Composable
 private fun ProductDetailsCard(
@@ -181,15 +193,11 @@ private fun ProductDetailsCard(
     ingredients: String
 ){
     Card(
-        modifier = Modifier
-            .fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp),
         colors = CardDefaults.cardColors(SurfaceDark)
     ) {
-        Column(modifier = Modifier
-            .fillMaxSize()
-            .padding(12.dp)
-        ) {
+        Column(modifier = Modifier.padding(12.dp)) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -224,21 +232,63 @@ private fun ProductDetailsCard(
             Spacer(modifier = Modifier.height(4.dp))
             Text(
                 text = description,
-                fontSize = FontSize.REGULAR
+                fontSize = FontSize.REGULAR,
             )
             Spacer(modifier = Modifier.height(8.dp))
             DetailsInfoSection(
-                title = "Allergy Advice",
+                title = "Aller Advice",
                 body = allergyAdvice
             )
             Spacer(modifier = Modifier.height(8.dp))
             DetailsInfoSection(
                 title = "Ingredients",
-                body = ingredients
+                body = ingredients,
             )
         }
     }
+
+
 }
+
+@Composable
+private fun QuantityStepper(
+    quantity: Int,
+    onMinusClick: () -> Unit,
+    onPlusClick: () -> Unit
+){
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        StepperButton(text = "-", onClick = onMinusClick)
+        Text(
+            text = quantity.toString().padStart(2, '0'),
+            fontSize = FontSize.REGULAR,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(horizontal = 12.dp)
+
+        )
+        StepperButton(text = "+", onClick = onPlusClick)
+    }
+}
+
+@Composable
+private fun StepperButton(
+    text: String,
+    onClick: () -> Unit
+){
+    OutlinedButton(
+        onClick = onClick,
+        contentPadding = PaddingValues(0.dp),
+        modifier = Modifier.size(24.dp),
+        shape = RoundedCornerShape(6.dp),
+        border = BorderStroke(1.dp, BrandYellow)
+    ) {
+        Text(
+            text = text,
+            fontSize = FontSize.REGULAR,
+            fontWeight = FontWeight.Bold
+        )
+    }
+}
+
 @Composable
 private fun DetailsInfoSection(
     title: String,
@@ -247,15 +297,15 @@ private fun DetailsInfoSection(
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(Surface)
+        colors = CardDefaults.cardColors(SurfaceLight)
     ) {
         Column(modifier = Modifier.padding(12.dp)) {
             Text(
                 text = title,
-                fontSize = FontSize.REGULAR,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
+                fontSize = FontSize.REGULAR
             )
-            Spacer(modifier = Modifier.width(4.dp))
+            Spacer(modifier = Modifier.height(4.dp))
             Text(
                 text = body,
                 fontSize = FontSize.REGULAR
@@ -270,74 +320,66 @@ private fun DetailsBottomActions(
     onAddToCart: () -> Unit,
     onBuyNow: () -> Unit
 ){
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 12.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        Row(
+    Row (
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ){
+       OutlinedIconButton(
+           onClick = onFavourite,
+           modifier = Modifier.size(46.dp),
+           shape = RoundedCornerShape(12.dp),
+           border = BorderStroke(1.dp, BorderIdle)
+       ) {
+           Icon(
+               painter = painterResource(Resources.Icon.Heart),
+               contentDescription = "Heart icon",
+               modifier = Modifier.size(24.dp)
+           )
+       }
+        Button(
+            onClick = onAddToCart,
             modifier = Modifier
-                .fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalAlignment = Alignment.CenterVertically
+                .height(46.dp)
+                .weight(1f),
+            shape = RoundedCornerShape(12.dp),
+            colors = ButtonDefaults.buttonColors(BrandYellow)
         ) {
-            OutlinedIconButton(
-                onClick = onFavourite,
-                modifier = Modifier.size(46.dp),
-                shape = RoundedCornerShape(12.dp),
-                border = BorderStroke(1.dp, BorderIdle)
-            ) {
-                Icon(
-                    painter = painterResource(Resources.Icon.Heart),
-                    contentDescription = "Heart icon",
-                    modifier = Modifier.size(24.dp)
-                )
-            }
-            Button(
-                onClick = onAddToCart,
-                modifier = Modifier
-                    .height(46.dp)
-                    .weight(1f),
-                shape = RoundedCornerShape(12.dp),
-                colors = ButtonDefaults.buttonColors(BrandYellow)
-            ){
-                Text(
-                    text = "Add to cart",
-                    fontSize = FontSize.REGULAR,
-                    fontWeight = FontWeight.Bold,
-                    color = TextPrimary
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Icon(
-                    painter = painterResource(Resources.Icon.ShoppingCart),
-                    contentDescription = "Shopping cart icon",
-                    modifier = Modifier.size(16.dp),
-                    tint = IconPrimary
-                )
-            }
-            Button(
-                onClick = onBuyNow,
-                modifier = Modifier
-                    .height(46.dp)
-                    .weight(1f),
-                shape = RoundedCornerShape(12.dp),
-                colors = ButtonDefaults.buttonColors(BrandYellow)
-            ){
-                Text(
-                    text = "Buy Now",
-                    fontSize = FontSize.REGULAR,
-                    fontWeight = FontWeight.Bold,
-                    color = TextPrimary
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Icon(
-                    painter = painterResource(Resources.Icon.Pound),
-                    contentDescription = "Pound Sterling icon",
-                    modifier = Modifier.size(16.dp),
-                    tint = IconPrimary
-                )
-            }
+            Text(
+                text = "Add to Cart",
+                fontWeight = FontWeight.Bold,
+                fontSize = FontSize.REGULAR,
+                color = TextPrimary
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Icon(
+                painter = painterResource(Resources.Icon.ShoppingCart),
+                contentDescription = "Shopping cart icon",
+                modifier = Modifier.size(16.dp),
+                tint = IconPrimary
+            )
+        }
+        Button(
+            onClick = onBuyNow,
+            modifier = Modifier
+                .height(46.dp)
+                .weight(1f),
+            shape = RoundedCornerShape(12.dp),
+            colors = ButtonDefaults.buttonColors(BrandYellow)
+        ) {
+            Text(
+                text = "Buy Now",
+                fontWeight = FontWeight.Bold,
+                fontSize = FontSize.REGULAR,
+                color = TextPrimary
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Icon(
+                painter = painterResource(Resources.Icon.Pound),
+                contentDescription = "Pound Sterling icon",
+                modifier = Modifier.size(16.dp),
+                tint = IconPrimary
+            )
         }
     }
 }
