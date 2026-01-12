@@ -7,6 +7,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.auth
 import com.google.firebase.auth.userProfileChangeRequest
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.firestore
 import com.google.firebase.firestore.snapshots
 import com.google.firebase.storage.FirebaseStorage
@@ -21,6 +22,10 @@ import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.tasks.await
 
+private const val CUSTOMER_COLLECTION = "customer"
+private const val CART_SUBCOLLECTION = "cart"
+private const val FAVOURITE_SUBCOLLECTION = "favourite"
+
 class CustomerRepoImpl: CustomerRepository {
 
     override fun getCurrentUserId(): String? =
@@ -33,7 +38,7 @@ class CustomerRepoImpl: CustomerRepository {
         onError: (String) -> Unit
     ){
         try {
-            val customerCollection = Firebase.firestore.collection("customer")
+            val customerCollection = Firebase.firestore.collection(CUSTOMER_COLLECTION)
             val docRef = customerCollection.document(user.uid)
             val snapshot = docRef.get().await()
 
@@ -58,7 +63,7 @@ class CustomerRepoImpl: CustomerRepository {
             val userId = getCurrentUserId()
             if (userId != null) {
                 val dataBase = Firebase.firestore
-                dataBase.collection("customer")
+                dataBase.collection(CUSTOMER_COLLECTION)
                     .document(userId)
                     .snapshots()
                     .collectLatest { documentSnapshot ->
@@ -130,7 +135,7 @@ class CustomerRepoImpl: CustomerRepository {
             val userId = getCurrentUserId()
             if (userId != null){
                 val firestore = Firebase.firestore
-                val customerCollection = firestore.collection("customer")
+                val customerCollection = firestore.collection(CUSTOMER_COLLECTION)
                 val existingCustomer = customerCollection
                     .document(customer.id)
                     .get().await()
@@ -178,7 +183,7 @@ class CustomerRepoImpl: CustomerRepository {
 
     override suspend fun updateProfilePictureUrl(url: String): RequestState<Unit>  = try {
         val uid = getCurrentUserId() ?: return RequestState.Error("User is not available.")
-        Firebase.firestore.collection("customer")
+        Firebase.firestore.collection(CUSTOMER_COLLECTION)
             .document(uid)
             .update("profilePhotoUrl", url)
             .await()
@@ -224,6 +229,103 @@ class CustomerRepoImpl: CustomerRepository {
             RequestState.Success(Unit)
         } catch (e: Exception){
             RequestState.Error("Error while signing out: ${e.message}")
+        }
+    }
+
+    override suspend fun addToCart(
+        productId: String,
+        quantityToAdd: Int
+    ): RequestState<Unit> {
+        return try {
+            val uid = getCurrentUserId() ?: return RequestState.Error("User not available.")
+            if (productId.isBlank()) return RequestState.Error("Invalid product id.")
+            if (quantityToAdd <= 0) return RequestState.Error("Quantity must be at least 1.")
+
+            val cartDoc = Firebase.firestore
+                .collection(CUSTOMER_COLLECTION)
+                .document(uid)
+                .collection(CART_SUBCOLLECTION)
+                .document(productId)
+
+            Firebase.firestore.runTransaction { trx ->
+                val snap = trx.get(cartDoc)
+                if (snap.exists()) {
+                    trx.update(
+                        cartDoc,
+                        mapOf(
+                            "quantity" to FieldValue.increment(quantityToAdd.toLong()),
+                            "updatedAt" to FieldValue.serverTimestamp()
+                        )
+                    )
+                } else {
+                    trx.set(
+                        cartDoc,
+                        mapOf(
+                            "productId" to productId,
+                            "quantity" to quantityToAdd,
+                            "createdAt" to FieldValue.serverTimestamp(),
+                            "updatedAd" to FieldValue.serverTimestamp()
+                        )
+                    )
+                }
+                Unit
+            }.await()
+            RequestState.Success(Unit)
+        } catch (e: Exception) {
+            RequestState.Error("Failed to add item to cart: ${e.message}")
+        }
+    }
+
+    override suspend fun toggleFavourite(productId: String): RequestState<Boolean> {
+        return try {
+            val uid = getCurrentUserId() ?: return RequestState.Error("User not available.")
+            if (productId.isBlank()) return RequestState.Error("Invalid product id.")
+
+            val favDoc = Firebase.firestore
+                .collection(CUSTOMER_COLLECTION)
+                .document(uid)
+                .collection(FAVOURITE_SUBCOLLECTION)
+                .document(productId)
+
+            val isFavouriteToggle = Firebase.firestore.runTransaction { trx ->
+                val snap = trx.get(favDoc)
+                if (snap.exists()) {
+                    trx.delete(favDoc)
+                    false
+                }  else {
+                    trx.set(
+                        favDoc,
+                        mapOf(
+                            "productId" to productId,
+                            "createdAt" to FieldValue.serverTimestamp(),
+                        )
+                    )
+                    true
+                }
+            }.await()
+            RequestState.Success(isFavouriteToggle)
+        } catch (e: Exception){
+            RequestState.Error("Failed to toggle favourite: ${e.message}")
+        }
+    }
+
+    override suspend fun isFavourite(productId: String): RequestState<Boolean> {
+        return try {
+            val uid = getCurrentUserId() ?: return RequestState.Error("User not available.")
+            if (productId.isBlank()) return RequestState.Error("Invalid product id.")
+
+            val isFavDoc = Firebase.firestore
+                .collection(CUSTOMER_COLLECTION)
+                .document(uid)
+                .collection(FAVOURITE_SUBCOLLECTION)
+                .document(productId)
+                .get()
+                .await()
+
+
+            RequestState.Success(isFavDoc.exists())
+        } catch (e: Exception){
+            RequestState.Error("Failed to read favourite state: ${e.message}")
         }
     }
 }

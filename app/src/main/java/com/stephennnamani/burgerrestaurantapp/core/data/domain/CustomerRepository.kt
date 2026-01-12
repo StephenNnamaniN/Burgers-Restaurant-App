@@ -25,4 +25,14 @@ interface CustomerRepository {
     suspend fun updateProfilePictureUrl(url: String): RequestState<Unit>
     suspend fun uploadProfilePhoto(localUrl: Uri, onProgress: (Float) -> Unit): RequestState<String>
     suspend fun signOut(): RequestState<Unit>
+
+
+    //Cart functions
+    suspend fun addToCart(
+        productId: String,
+        quantityToAdd: Int
+    ): RequestState<Unit>
+
+    suspend fun toggleFavourite(productId: String): RequestState<Boolean>
+    suspend fun isFavourite(productId: String): RequestState<Boolean>
 }
