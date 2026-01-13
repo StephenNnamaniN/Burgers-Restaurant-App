@@ -46,6 +46,7 @@ import coil3.request.crossfade
 import com.stephennnamani.burgerrestaurantapp.feature.component.InfoCard
 import com.stephennnamani.burgerrestaurantapp.feature.component.LoadingCard
 import com.stephennnamani.burgerrestaurantapp.feature.component.PrimaryButton
+import com.stephennnamani.burgerrestaurantapp.feature.component.dialog.AddMoreToCartDialog
 import com.stephennnamani.burgerrestaurantapp.feature.util.DisplayResult
 import com.stephennnamani.burgerrestaurantapp.ui.theme.BorderIdle
 import com.stephennnamani.burgerrestaurantapp.ui.theme.BrandBrown
@@ -68,6 +69,25 @@ fun ProductDetailsScreen(
     val viewModel = koinViewModel<ProductDetailsViewModel>()
     val productState by viewModel.product.collectAsState()
     val quantity by viewModel.quantity.collectAsState()
+    val uiState by viewModel.uiState.collectAsState()
+
+
+    if (uiState.showSuggestedDialog) {
+        AddMoreToCartDialog(
+            suggestedProducts  = uiState.suggestedProducts,
+            addedIds = uiState.addedSuggestedIds,
+            totalPrice = uiState.addedCartTotal,
+            onDismiss = viewModel::dismissSuggestedDialog,
+            onProductClick = {},
+            onAddChecked = { product ->
+                viewModel.addSuggestedToCart(product, quantityToAdd = 1)
+            },
+            onRemoveChecked = { product ->
+                viewModel.removeSuggestedFromCart(product, quantityToRemove = 1)
+            },
+            onCheckout = {}
+        )
+    }
 
     Scaffold(
         containerColor = Surface,
@@ -162,7 +182,8 @@ fun ProductDetailsScreen(
                             DetailsBottomActions(
                                 onFavourite = viewModel::toggleFavourite,
                                 onBuyNow = viewModel::buyNow,
-                                onAddToCart = viewModel::addToCart
+                                onAddToCart = viewModel::addToCart,
+                                isFavourite = uiState.isFavourite
                             )
                         }
                     }
@@ -312,6 +333,7 @@ private fun DetailsInfoSection(
 
 @Composable
 private fun DetailsBottomActions(
+    isFavourite: Boolean,
     onFavourite: () -> Unit,
     onAddToCart: () -> Unit,
     onBuyNow: () -> Unit
@@ -328,9 +350,11 @@ private fun DetailsBottomActions(
            border = BorderStroke(1.dp, BorderIdle)
        ) {
            Icon(
-               painter = painterResource(Resources.Icon.Heart),
+               painter = painterResource(
+                   if (isFavourite) Resources.Icon.HeartFilled else Resources.Icon.Heart),
                contentDescription = "Heart icon",
-               modifier = Modifier.size(24.dp)
+               modifier = Modifier.size(24.dp),
+               tint = if (isFavourite) BrandBrown else IconPrimary
            )
        }
         Button(
