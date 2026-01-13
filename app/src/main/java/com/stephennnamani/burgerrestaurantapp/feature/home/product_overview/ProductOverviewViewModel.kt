@@ -2,6 +2,7 @@ package com.stephennnamani.burgerrestaurantapp.feature.home.product_overview
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.stephennnamani.burgerrestaurantapp.core.data.domain.CustomerRepository
 import com.stephennnamani.burgerrestaurantapp.core.data.domain.ProductRepository
 import com.stephennnamani.burgerrestaurantapp.core.data.models.Product
 import com.stephennnamani.burgerrestaurantapp.core.data.models.ProductCategory
@@ -22,7 +23,8 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
 class ProductOverviewViewModel(
-    private val productRepository: ProductRepository
+    private val productRepository: ProductRepository,
+    private val customerRepository: CustomerRepository
 ): ViewModel() {
     val newProducts = productRepository.readNewProducts()
         .stateIn(
@@ -116,5 +118,20 @@ class ProductOverviewViewModel(
 
     fun clearCategory() {
         _selectedCategory.value = null
+    }
+
+    val favouriteIds: StateFlow<RequestState<Set<String>>> =
+        customerRepository.readFavouriteIdFlow()
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(5000),
+                initialValue = RequestState.Loading
+            )
+
+    fun toggleFavourite(productId: String) {
+        if (productId.isBlank()) return
+        viewModelScope.launch {
+            customerRepository.toggleFavourite(productId)
+        }
     }
 }

@@ -1,9 +1,11 @@
 package com.stephennnamani.burgerrestaurantapp.feature.component
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
@@ -16,6 +18,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
+import androidx.compose.material3.OutlinedIconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -32,10 +35,13 @@ import coil3.compose.AsyncImage
 import coil3.compose.LocalPlatformContext
 import coil3.request.ImageRequest
 import coil3.request.crossfade
+import com.stephennnamani.burgerrestaurantapp.core.data.models.Favourite
 import com.stephennnamani.burgerrestaurantapp.core.data.models.Product
 import com.stephennnamani.burgerrestaurantapp.feature.util.Alpha
 import com.stephennnamani.burgerrestaurantapp.ui.theme.BorderIdle
+import com.stephennnamani.burgerrestaurantapp.ui.theme.BrandBrown
 import com.stephennnamani.burgerrestaurantapp.ui.theme.FontSize
+import com.stephennnamani.burgerrestaurantapp.ui.theme.IconPrimary
 import com.stephennnamani.burgerrestaurantapp.ui.theme.Resources
 import com.stephennnamani.burgerrestaurantapp.ui.theme.SurfaceLight
 import com.stephennnamani.burgerrestaurantapp.ui.theme.TextPrimary
@@ -46,7 +52,10 @@ import com.stephennnamani.burgerrestaurantapp.ui.theme.oswaldVariableFont
 fun ProductCard(
     modifier: Modifier = Modifier,
     product: Product,
-    onClick: (String) -> Unit
+    onClick: (String) -> Unit,
+    showFavouriteIcon: Boolean = false,
+    isFavourite: Boolean = false,
+    onToggleFavourite: ((String) -> Unit)? = null
 ){
     Row(
         modifier = modifier.fillMaxWidth()
@@ -121,22 +130,43 @@ fun ProductCard(
                 }
             }
         }
-        AsyncImage(
-            modifier = Modifier
-                .width(140.dp)
-                .fillMaxHeight()
-                .clip(RoundedCornerShape(12.dp))
-                .border(
-                    width = 1.dp,
-                    color = BorderIdle,
-                    shape = RoundedCornerShape(12.dp)
-                ),
-            model = ImageRequest.Builder(LocalPlatformContext.current)
-                .data(product.productImage)
-                .crossfade(enable = true)
-                .build(),
-            contentDescription = "Product image",
-            contentScale = ContentScale.Crop
-        )
+        Box {
+            AsyncImage(
+                modifier = Modifier
+                    .width(140.dp)
+                    .fillMaxHeight()
+                    .clip(RoundedCornerShape(12.dp))
+                    .border(
+                        width = 1.dp,
+                        color = BorderIdle,
+                        shape = RoundedCornerShape(12.dp)
+                    ),
+                model = ImageRequest.Builder(LocalPlatformContext.current)
+                    .data(product.productImage)
+                    .crossfade(enable = true)
+                    .build(),
+                contentDescription = "Product image",
+                contentScale = ContentScale.Crop
+            )
+            if (showFavouriteIcon) {
+                OutlinedIconButton(
+                    onClick = {onToggleFavourite?.invoke(product.id)},
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(12.dp)
+                        .size(36.dp),
+                    shape = RoundedCornerShape(12.dp),
+                    border = BorderStroke(1.dp, BorderIdle)
+                ) {
+                    Icon(
+                        painter = painterResource(
+                            if (isFavourite) Resources.Icon.HeartFilled else Resources.Icon.Heart),
+                        contentDescription = "Heart icon",
+                        modifier = Modifier.size(24.dp),
+                        tint = if (isFavourite) BrandBrown else IconPrimary
+                    )
+                }
+            }
+        }
     }
 }

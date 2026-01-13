@@ -59,7 +59,7 @@ val appModule = module {
     viewModel { ProfileViewModel(get(), get()) }
     viewModel { ManageProductViewModel(get(), get()) }
     viewModel { AdminPanelViewModel(get()) }
-    viewModel { ProductOverviewViewModel(get()) }
+    viewModel { ProductOverviewViewModel(get(), get()) }
     viewModel { ProductDetailsViewModel(get(), get(), get()) }
 
     single {
