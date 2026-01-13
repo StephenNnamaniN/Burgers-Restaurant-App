@@ -264,7 +264,7 @@ class CustomerRepoImpl: CustomerRepository {
                         mapOf(
                             "productId" to productId,
                             "quantity" to quantityToAdd,
-                            "productTitle" to productTitle,
+                            "title" to productTitle,
                             "createdAt" to FieldValue.serverTimestamp(),
                             "updatedAd" to FieldValue.serverTimestamp()
                         )
@@ -297,16 +297,16 @@ class CustomerRepoImpl: CustomerRepository {
                 val snap = trx.get(cartDoc)
                 if (!snap.exists()) return@runTransaction
 
-                val currentQty = (snap.getLong("quantity") ?: 0).toInt()
-                val newQty = currentQty - quantityToRemove
-                if (newQty <= 0 ){
+                val currentQty = (snap.getLong("quantity") ?: 0L).toInt()
+                val newQty = currentQty -quantityToRemove
+                if (newQty <= 0) {
                     trx.delete(cartDoc)
                 } else {
                     trx.update(
                         cartDoc,
                         mapOf(
-                            "quantity" to newQty,
-                            "updatedAd" to FieldValue.serverTimestamp()
+                            "quantity" to quantityToRemove,
+                            "createdAt" to FieldValue.serverTimestamp(),
                         )
                     )
                 }
