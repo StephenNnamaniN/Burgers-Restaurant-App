@@ -127,18 +127,18 @@ class ProductDetailsViewModel(
             _baseUiState.update { it.copy(actionMessage = null) }
             when (
                 customerRepository.addToCart(
-                    products.id,
-                    products.title,
-                    qty
+                    productId = products.id,
+                    productTitle = products.title,
+                    quantityToAdd = qty
                 )
             ){
                 is RequestState.Success -> {
-                    val initialTotal = products.price * qty
+                    val initialTotal = products.price *qty
                     _baseUiState.update { it.copy(
                         showSuggestedDialog = true,
                         addedCartTotal = initialTotal
                     ) }
-                    _suggestedEnabled .value = true
+                    _suggestedEnabled.value = true
                 }
                 is RequestState.Error -> {
                     _baseUiState.update { it.copy(actionMessage = "Failed to add to cart.") }
@@ -147,6 +147,7 @@ class ProductDetailsViewModel(
             }
         }
     }
+
     fun addSuggestedToCart(product: Product, quantityToAdd: Int = 1){
         if (_baseUiState.value.addedSuggestedIds.contains(product.id)) return
 
@@ -171,28 +172,26 @@ class ProductDetailsViewModel(
         }
     }
 
-    fun removeSuggestedFromCart(product: Product, quantityToRemove: Int = 1){
+    fun removeSuggestedFromCart(product: Product, quantityToRemove: Int = 1) {
         val wasAdded = _baseUiState.value.addedSuggestedIds.contains(product.id)
         if (!wasAdded) return
 
         viewModelScope.launch {
-            when (
-                customerRepository.removeFromCart(
-                    productId = product.id,
-                    quantityToRemove = quantityToRemove)
-            ){
+            when (customerRepository.removeFromCart(product.id, quantityToRemove)) {
                 is RequestState.Success -> {
                     _baseUiState.update { state ->
                         state.copy(
                             addedSuggestedIds = state.addedSuggestedIds - product.id,
-                            addedCartTotal = (state.addedCartTotal - (product.price * quantityToRemove)
-                        ).coerceAtLeast(0.0))
+                            addedCartTotal = (state.addedCartTotal - (product.price * quantityToRemove))
+                                .coerceAtLeast(0.0)
+                        )
                     }
                 }
                 else -> Unit
             }
         }
     }
+
     fun toggleFavourite(){
         viewModelScope.launch {
             customerRepository.toggleFavourite(productId)

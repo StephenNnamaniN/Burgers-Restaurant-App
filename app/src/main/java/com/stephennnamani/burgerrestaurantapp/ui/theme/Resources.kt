@@ -32,6 +32,7 @@ object Resources {
         val Bell = R.drawable.icon_belloutline
         val Gift = R.drawable.icon_gift
         val Heart = R.drawable.icon_heartoutline
+        val HeartFilled = R.drawable.heart_filled
         val Dog = R.drawable.dog
         val Burgers = R.drawable.burger
         val Nuggets = R.drawable.nuggets
