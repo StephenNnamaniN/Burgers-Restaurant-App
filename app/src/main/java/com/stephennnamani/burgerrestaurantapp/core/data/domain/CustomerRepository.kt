@@ -43,4 +43,6 @@ interface CustomerRepository {
     suspend fun isFavourite(productId: String): RequestState<Boolean>
 
     fun readFavouriteIdFlow(): Flow<RequestState<Set<String>>>
+
+    fun readBadgeCountFlow(): Flow<RequestState<Int>>
 }

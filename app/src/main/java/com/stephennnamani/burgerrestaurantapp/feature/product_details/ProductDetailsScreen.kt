@@ -46,6 +46,7 @@ import coil3.request.crossfade
 import com.stephennnamani.burgerrestaurantapp.feature.component.InfoCard
 import com.stephennnamani.burgerrestaurantapp.feature.component.LoadingCard
 import com.stephennnamani.burgerrestaurantapp.feature.component.PrimaryButton
+import com.stephennnamani.burgerrestaurantapp.feature.component.QuantityStepper
 import com.stephennnamani.burgerrestaurantapp.feature.component.dialog.AddMoreToCartDialog
 import com.stephennnamani.burgerrestaurantapp.feature.util.DisplayResult
 import com.stephennnamani.burgerrestaurantapp.ui.theme.BorderIdle
@@ -265,45 +266,6 @@ private fun ProductDetailsCard(
     }
 
 
-}
-
-@Composable
-private fun QuantityStepper(
-    quantity: Int,
-    onMinusClick: () -> Unit,
-    onPlusClick: () -> Unit
-){
-    Row(verticalAlignment = Alignment.CenterVertically) {
-        StepperButton(text = "-", onClick = onMinusClick)
-        Text(
-            text = quantity.toString().padStart(2, '0'),
-            fontSize = FontSize.REGULAR,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(horizontal = 12.dp)
-
-        )
-        StepperButton(text = "+", onClick = onPlusClick)
-    }
-}
-
-@Composable
-private fun StepperButton(
-    text: String,
-    onClick: () -> Unit
-){
-    OutlinedButton(
-        onClick = onClick,
-        contentPadding = PaddingValues(0.dp),
-        modifier = Modifier.size(24.dp),
-        shape = RoundedCornerShape(6.dp),
-        border = BorderStroke(1.dp, BrandYellow)
-    ) {
-        Text(
-            text = text,
-            fontSize = FontSize.REGULAR,
-            fontWeight = FontWeight.Bold
-        )
-    }
 }
 
 @Composable

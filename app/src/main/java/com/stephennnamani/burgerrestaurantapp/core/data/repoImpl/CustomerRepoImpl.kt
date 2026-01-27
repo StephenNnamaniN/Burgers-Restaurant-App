@@ -392,4 +392,25 @@ class CustomerRepoImpl: CustomerRepository {
             RequestState.Error("Failed to read favourites: ${e.message}")
         }
     }
+
+    override fun readBadgeCountFlow(): Flow<RequestState<Int>> = channelFlow {
+        try {
+            val uid = getCurrentUserId()
+            if (uid.isNullOrBlank()){
+                send(RequestState.Error("User not available."))
+                return@channelFlow
+            }
+            send(RequestState.Loading)
+            Firebase.firestore
+                .collection(CUSTOMER_COLLECTION)
+                .document(uid)
+                .collection(CART_SUBCOLLECTION)
+                .snapshots()
+                .collectLatest { snapshots ->
+                    send(RequestState.Success(snapshots.size()))
+                }
+        } catch (e: Exception){
+            RequestState.Error("Failed to read size items in the cart.: ${e.message}")
+        }
+    }
 }

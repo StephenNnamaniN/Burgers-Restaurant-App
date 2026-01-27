@@ -74,6 +74,9 @@ fun HomeScreen(
     val isAdmin by viewModel.isAdmin.collectAsState()
     val context = LocalContext.current
 
+    val cartBadgeState by viewModel.cartBadgeCount.collectAsState()
+    val cartCount = cartBadgeState.getSuccessDataOrNull() ?: 0
+
     val selectedDestination by remember {
         derivedStateOf {
             val route = currentRoute.value?.destination?.route.toString()
@@ -227,7 +230,8 @@ fun HomeScreen(
                                     }
                                     restoreState = true
                                 }
-                            }
+                            },
+                            cartCount = cartCount
                         )
                     }
                 }
