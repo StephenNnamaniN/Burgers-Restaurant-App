@@ -20,10 +20,14 @@ import com.stephennnamani.burgerrestaurantapp.ui.theme.FontSize
 fun QuantityStepper(
     quantity: Int,
     onMinusClick: () -> Unit,
-    onPlusClick: () -> Unit
+    onPlusClick: () -> Unit,
+    minValue: Int = 0,
+    maxValue: Int = 99,
 ){
+    val counterDecr = quantity > minValue
+    val counterIncr = quantity < maxValue
     Row(verticalAlignment = Alignment.CenterVertically) {
-        StepperButton(text = "-", onClick = onMinusClick)
+        StepperButton(text = "-", enabled = counterDecr, onClick = onMinusClick)
         Text(
             text = quantity.toString().padStart(2, '0'),
             fontSize = FontSize.REGULAR,
@@ -31,17 +35,19 @@ fun QuantityStepper(
             modifier = Modifier.padding(horizontal = 12.dp)
 
         )
-        StepperButton(text = "+", onClick = onPlusClick)
+        StepperButton(text = "+", enabled = counterIncr, onClick = onPlusClick)
     }
 }
 
 @Composable
 private fun StepperButton(
     text: String,
+    enabled: Boolean,
     onClick: () -> Unit
 ){
     OutlinedButton(
         onClick = onClick,
+        enabled = enabled,
         contentPadding = PaddingValues(0.dp),
         modifier = Modifier.size(24.dp),
         shape = RoundedCornerShape(6.dp),
