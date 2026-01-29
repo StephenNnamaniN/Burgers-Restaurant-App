@@ -2,6 +2,7 @@ package com.stephennnamani.burgerrestaurantapp.core.data.domain
 
 import android.net.Uri
 import com.google.firebase.auth.FirebaseUser
+import com.stephennnamani.burgerrestaurantapp.core.data.models.Cart
 import com.stephennnamani.burgerrestaurantapp.core.data.models.Customer
 import com.stephennnamani.burgerrestaurantapp.feature.util.RequestState
 import kotlinx.coroutines.flow.Flow
@@ -45,4 +46,8 @@ interface CustomerRepository {
     fun readFavouriteIdFlow(): Flow<RequestState<Set<String>>>
 
     fun readBadgeCountFlow(): Flow<RequestState<Int>>
+
+    fun readCartFlow(): Flow<RequestState<List<Cart>>>
+    suspend fun deleteCartItem(productId: String): RequestState<Unit>
+    suspend fun setCartQuantity(productId: String, newQuantity: Int): RequestState<Unit>
 }

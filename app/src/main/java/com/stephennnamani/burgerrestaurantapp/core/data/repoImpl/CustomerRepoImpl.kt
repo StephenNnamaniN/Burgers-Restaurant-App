@@ -8,16 +8,20 @@ import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.auth
 import com.google.firebase.auth.userProfileChangeRequest
 import com.google.firebase.firestore.FieldValue
+import com.google.firebase.firestore.SetOptions
 import com.google.firebase.firestore.firestore
 import com.google.firebase.firestore.snapshots
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.storageMetadata
 import com.stephennnamani.burgerrestaurantapp.core.data.domain.CustomerRepository
+import com.stephennnamani.burgerrestaurantapp.core.data.models.Cart
 import com.stephennnamani.burgerrestaurantapp.core.data.models.Country
 import com.stephennnamani.burgerrestaurantapp.core.data.models.Customer
 import com.stephennnamani.burgerrestaurantapp.core.data.models.PhoneNumber
 import com.stephennnamani.burgerrestaurantapp.feature.util.RequestState
+import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.tasks.await
@@ -411,6 +415,86 @@ class CustomerRepoImpl: CustomerRepository {
                 }
         } catch (e: Exception){
             RequestState.Error("Failed to read size items in the cart.: ${e.message}")
+        }
+    }
+
+    override fun readCartFlow(): Flow<RequestState<List<Cart>>> = callbackFlow {
+        val uid = getCurrentUserId()
+        if (uid == null) {
+            trySend(RequestState.Error("User not available."))
+            close()
+            return@callbackFlow
+        }
+
+         trySend(RequestState.Loading)
+        val listener = Firebase.firestore
+            .collection(CUSTOMER_COLLECTION)
+            .document(uid)
+            .collection(CART_SUBCOLLECTION)
+            .addSnapshotListener { snapshot, error ->
+                if (error != null){
+                    trySend(RequestState.Error(error.message ?: "Failed to read cart."))
+                    return@addSnapshotListener
+                }
+                val docs = snapshot?.documents.orEmpty()
+                val cart = docs.mapNotNull { documentSnapshot ->
+                    val productId = documentSnapshot.getString("productId") ?: documentSnapshot.id
+                    val quantity = (documentSnapshot.getLong("quantity") ?: 0L).toInt()
+                    if (quantity <= 0) null else Cart(productId = productId, quantity = quantity)
+                }
+                trySend(RequestState.Success(cart))
+            }
+        awaitClose { listener.remove() }
+    }
+
+    override suspend fun deleteCartItem(productId: String): RequestState<Unit> {
+        return try {
+            val uid = getCurrentUserId() ?: return RequestState.Error("User not available.")
+            if (productId.isBlank()) return RequestState.Error("Invalid product id.")
+
+            Firebase.firestore
+                .collection(CUSTOMER_COLLECTION)
+                .document(uid)
+                .collection(CART_SUBCOLLECTION)
+                .document(productId)
+                .delete()
+                .await()
+            RequestState.Success(Unit)
+        } catch (e: Exception) {
+            RequestState.Error("Failed to delete cart item: ${e.message}")
+        }
+    }
+
+    override suspend fun setCartQuantity(
+        productId: String,
+        newQuantity: Int
+    ): RequestState<Unit> {
+        return try {
+            val uid = getCurrentUserId() ?: return RequestState.Error("User not available.")
+            if (productId.isBlank()) return RequestState.Error("Invalid product id.")
+
+            val cartQuantity = newQuantity.coerceIn(0, 99)
+            val cartDoc = Firebase.firestore
+                .collection(CUSTOMER_COLLECTION)
+                .document(uid)
+                .collection(CART_SUBCOLLECTION)
+                .document(productId)
+
+            if (cartQuantity == 0){
+                cartDoc.delete()
+            } else {
+                cartDoc.set(
+                    mapOf(
+                        "productId" to productId,
+                        "quantity" to cartQuantity,
+                        "updatedAt" to FieldValue.serverTimestamp()
+                    ),
+                    SetOptions.merge()
+                ).await()
+            }
+            RequestState.Success(Unit)
+        } catch (e: Exception) {
+            RequestState.Error("Failed to update cart quantity: ${e.message}")
         }
     }
 }
