@@ -6,12 +6,14 @@ import com.google.firebase.auth.FirebaseAuth
 import com.stephennnamani.burgerrestaurantapp.R
 import com.stephennnamani.burgerrestaurantapp.core.data.auth.GoogleUiClient
 import com.stephennnamani.burgerrestaurantapp.core.data.domain.AdminRepository
+import com.stephennnamani.burgerrestaurantapp.core.data.domain.CartRepository
 import com.stephennnamani.burgerrestaurantapp.core.data.domain.CountryRepository
 import com.stephennnamani.burgerrestaurantapp.core.data.domain.CountryRepositoryImpl
 import com.stephennnamani.burgerrestaurantapp.core.data.domain.CustomerRepository
 import com.stephennnamani.burgerrestaurantapp.core.data.domain.ProductRepository
 import com.stephennnamani.burgerrestaurantapp.core.data.remote.RestCountriesApi
 import com.stephennnamani.burgerrestaurantapp.core.data.repoImpl.AdminRepoImpl
+import com.stephennnamani.burgerrestaurantapp.core.data.repoImpl.CartRepoImpl
 import com.stephennnamani.burgerrestaurantapp.core.data.repoImpl.CustomerRepoImpl
 import com.stephennnamani.burgerrestaurantapp.core.data.repoImpl.ProductRepoImpl
 import com.stephennnamani.burgerrestaurantapp.feature.admin_panel.AdminPanelViewModel
@@ -53,6 +55,7 @@ val appModule = module {
     single<CustomerRepository> { CustomerRepoImpl() }
     single<AdminRepository> { AdminRepoImpl() }
     single<ProductRepository> { ProductRepoImpl() }
+    single<CartRepository> { CartRepoImpl(get(), get()) }
 
     viewModel { AuthViewModel(get()) }
     viewModel { HomeViewModel(get()) }
