@@ -30,6 +30,7 @@ import com.stephennnamani.burgerrestaurantapp.core.data.models.Product
 import com.stephennnamani.burgerrestaurantapp.feature.component.CartProductCard
 import com.stephennnamani.burgerrestaurantapp.feature.component.InfoCard
 import com.stephennnamani.burgerrestaurantapp.feature.component.LoadingCard
+import com.stephennnamani.burgerrestaurantapp.feature.component.QuantityStepper
 import com.stephennnamani.burgerrestaurantapp.feature.util.Alpha
 import com.stephennnamani.burgerrestaurantapp.feature.util.DisplayResult
 import com.stephennnamani.burgerrestaurantapp.feature.util.RequestState
@@ -44,12 +45,13 @@ import com.stephennnamani.burgerrestaurantapp.ui.theme.oswaldVariableFont
 @Composable
 fun AddMoreToCartDialog(
     suggestedProducts: RequestState<List<Product>>,
-    addedIds: Set<String>,
+    selectedQuantities: Map<String, Int>,
     totalPrice: Double,
     onDismiss: () -> Unit,
     onProductClick: (String) -> Unit,
-    onAddChecked: (Product) -> Unit,
-    onRemoveChecked: (Product) -> Unit,
+    onIncrement: (String) -> Unit,
+    onDecrement: (String) -> Unit,
+    goToCart: () -> Unit,
     onCheckout: () -> Unit
 ) {
     AlertDialog(
@@ -86,29 +88,20 @@ fun AddMoreToCartDialog(
                 onSuccess = { products ->
                     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                         products.take(10).forEach { product ->
-                            val checked = addedIds.contains(product.id)
+                            val qty = selectedQuantities[product.id] ?: 0
 
                             Box(modifier = Modifier.fillMaxWidth()) {
                                 CartProductCard(
                                     product = product,
-                                    onClick = onProductClick
-                                )
-                                Checkbox(
-                                    checked = checked,
-                                    onCheckedChange = { nowChecked ->
-                                        when {
-                                            nowChecked && !checked -> {
-                                                onAddChecked(product)
-                                            }
-                                            !nowChecked && checked -> {
-                                                onRemoveChecked(product)
-                                            }
-                                        }
-                                    },
-                                    modifier = Modifier
-                                        .align(Alignment.BottomEnd)
-                                        .padding(end = 6.dp)
-                                        .clip(RoundedCornerShape(12.dp))
+                                    onClick = onProductClick,
+                                    trailingContent = {
+                                        QuantityStepper(
+                                            quantity = qty,
+                                            minValue = 0,
+                                            onMinusClick = { onDecrement(product.id)},
+                                            onPlusClick = { onIncrement(product.id)}
+                                        )
+                                    }
                                 )
                             }
                         }
