@@ -19,6 +19,7 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.selects.select
 
 data class ProductDetailsUiState(
     val showSuggestedDialog: Boolean = false,
@@ -27,11 +28,12 @@ data class ProductDetailsUiState(
     val actionMessage: String? = null,
     val favouriteIds: Set<String> = emptySet(),
     val addedCartTotal: Double = 0.0,
-    val addedSuggestedIds: Set<String> = emptySet()
+    val addedSuggestedIds: Set<String> = emptySet(),
+    val suggestedQuantities: Map<String, Int> = emptyMap()
 )
 class ProductDetailsViewModel(
     private val productRepository: ProductRepository,
-    private val savedStateHandle: SavedStateHandle,
+    savedStateHandle: SavedStateHandle,
     private val customerRepository: CustomerRepository
 ): ViewModel() {
 
@@ -117,6 +119,28 @@ class ProductDetailsViewModel(
     fun productQtyDecrement() {
         _quantity.update { current -> (current - 1).coerceAtLeast(1) }
     }
+    fun incrementSuggested(productId: String) {
+        _baseUiState.update { state ->
+            val current = state.suggestedQuantities[productId] ?: 0
+            state.copy(
+                suggestedQuantities = state.suggestedQuantities +
+                        (productId to (current + 1)
+                            .coerceAtMost(99))
+
+            )
+        }
+    }
+
+    fun decrementSuggested(productId: String) {
+        _baseUiState.update { state ->
+            val current = state.suggestedQuantities[productId] ?: 0
+            val next = (current - 1) .coerceAtLeast(0)
+            val updatedMap =
+                if (next == 0) state.suggestedQuantities - productId
+                else state.suggestedQuantities + (productId to next)
+            state.copy(suggestedQuantities = updatedMap)
+        }
+    }
 
     // Stubs
     fun addToCart(){
@@ -148,49 +172,66 @@ class ProductDetailsViewModel(
         }
     }
 
-    fun addSuggestedToCart(product: Product, quantityToAdd: Int = 1){
-        if (_baseUiState.value.addedSuggestedIds.contains(product.id)) return
+    fun confirmSuggestedSelectionToCart(
+        onDone: () -> Unit
+    ){
+        val state = _baseUiState.value
+        val selected = state.suggestedQuantities.filterValues { it > 0 }
+        if(selected.isEmpty()) {
+            _baseUiState.update {
+                it.copy(
+                    suggestedQuantities = emptyMap(),
+                    showSuggestedDialog = false,
+                    actionMessage = null
+                )
+            }
+            onDone()
+            return
+        }
+        val products = (suggestedProducts.value as? RequestState.Success)?.data.orEmpty()
+        val productById = products.associateBy { it.id }
 
         viewModelScope.launch {
-            when (
-                customerRepository.addToCart(
+            _baseUiState.update { it.copy(actionMessage = null) }
+            val errors = mutableListOf<String>()
+
+            selected.forEach { (productId, qty)  ->
+                val product = productById[productId]
+
+                if (product == null) {
+                    errors.add("Could not resolve suggested product: $productId")
+                    return@forEach
+                }
+
+                val result = customerRepository.addToCart(
                     productId = product.id,
                     productTitle = product.title,
-                    quantityToAdd = quantityToAdd
+                    quantityToAdd = qty
                 )
-            ){
-                is RequestState.Success -> {
-                    _baseUiState.update { state ->
-                        state.copy(
-                            addedSuggestedIds = state.addedSuggestedIds + product.id,
-                            addedCartTotal = state.addedCartTotal + (product.price * quantityToAdd)
+                if (result is RequestState.Error) {
+                    errors.add("Failed to add ${product.title}: ${result.message}")
+                }
+                if (errors.isNotEmpty()){
+                    _baseUiState.update {
+                        it.copy(
+                            actionMessage = errors.joinToString { "\n" },
+                            showSuggestedDialog = true
                         )
                     }
+                    return@launch
                 }
-                else -> Unit
+                _baseUiState.update {
+                    it.copy(
+                        suggestedQuantities = emptyMap(),
+                        showSuggestedDialog = false,
+                        actionMessage = null
+                    )
+                }
+                onDone()
             }
         }
     }
 
-    fun removeSuggestedFromCart(product: Product, quantityToRemove: Int = 1) {
-        val wasAdded = _baseUiState.value.addedSuggestedIds.contains(product.id)
-        if (!wasAdded) return
-
-        viewModelScope.launch {
-            when (customerRepository.removeFromCart(product.id, quantityToRemove)) {
-                is RequestState.Success -> {
-                    _baseUiState.update { state ->
-                        state.copy(
-                            addedSuggestedIds = state.addedSuggestedIds - product.id,
-                            addedCartTotal = (state.addedCartTotal - (product.price * quantityToRemove))
-                                .coerceAtLeast(0.0)
-                        )
-                    }
-                }
-                else -> Unit
-            }
-        }
-    }
 
     fun toggleFavourite(){
         viewModelScope.launch {

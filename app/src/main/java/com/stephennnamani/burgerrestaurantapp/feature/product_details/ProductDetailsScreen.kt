@@ -22,7 +22,6 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedIconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -75,18 +74,15 @@ fun ProductDetailsScreen(
 
     if (uiState.showSuggestedDialog) {
         AddMoreToCartDialog(
-            suggestedProducts  = uiState.suggestedProducts,
-            addedIds = uiState.addedSuggestedIds,
+            suggestedProducts = uiState.suggestedProducts,
             totalPrice = uiState.addedCartTotal,
             onDismiss = viewModel::dismissSuggestedDialog,
             onProductClick = {},
-            onAddChecked = { product ->
-                viewModel.addSuggestedToCart(product, quantityToAdd = 1)
-            },
-            onRemoveChecked = { product ->
-                viewModel.removeSuggestedFromCart(product, quantityToRemove = 1)
-            },
-            onCheckout = {}
+            selectedQuantities = uiState.suggestedQuantities,
+            onIncrement = viewModel::incrementSuggested,
+            onDecrement = viewModel::decrementSuggested,
+            goToCart = {},
+            onCheckout = {  },
         )
     }
 
@@ -264,8 +260,6 @@ private fun ProductDetailsCard(
             )
         }
     }
-
-
 }
 
 @Composable
