@@ -64,7 +64,8 @@ import org.koin.androidx.compose.koinViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProductDetailsScreen(
-    navigateBack: () -> Unit
+    navigateBack: () -> Unit,
+    navigateToCart: () -> Unit
 ){
     val viewModel = koinViewModel<ProductDetailsViewModel>()
     val productState by viewModel.product.collectAsState()
@@ -75,14 +76,15 @@ fun ProductDetailsScreen(
     if (uiState.showSuggestedDialog) {
         AddMoreToCartDialog(
             suggestedProducts = uiState.suggestedProducts,
-            totalPrice = uiState.addedCartTotal,
+            initialItemTotal = uiState.addedCartTotal,
             onDismiss = viewModel::dismissSuggestedDialog,
             onProductClick = {},
             selectedQuantities = uiState.suggestedQuantities,
             onIncrement = viewModel::incrementSuggested,
             onDecrement = viewModel::decrementSuggested,
-            goToCart = {},
-            onCheckout = {  },
+            gotoCart = {
+                viewModel.confirmSuggestedSelectionToCart(onDone = { navigateToCart() })
+            },
         )
     }
 

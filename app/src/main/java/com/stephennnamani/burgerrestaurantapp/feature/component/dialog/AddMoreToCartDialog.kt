@@ -7,22 +7,18 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -46,14 +42,16 @@ import com.stephennnamani.burgerrestaurantapp.ui.theme.oswaldVariableFont
 fun AddMoreToCartDialog(
     suggestedProducts: RequestState<List<Product>>,
     selectedQuantities: Map<String, Int>,
-    totalPrice: Double,
+    initialItemTotal: Double,
     onDismiss: () -> Unit,
     onProductClick: (String) -> Unit,
     onIncrement: (String) -> Unit,
     onDecrement: (String) -> Unit,
-    goToCart: () -> Unit,
-    onCheckout: () -> Unit
+    gotoCart: () -> Unit
 ) {
+    val products = (suggestedProducts as? RequestState.Success)?.data.orEmpty()
+    val total = products.sumOf { product -> (selectedQuantities[product.id] ?: 0) * product.price }
+    val grandTotal = initialItemTotal + total
     AlertDialog(
         onDismissRequest = onDismiss,
         containerColor = Surface,
@@ -111,7 +109,7 @@ fun AddMoreToCartDialog(
         },
         confirmButton = {
             Button(
-                onClick = onCheckout,
+                onClick = gotoCart,
                 modifier = Modifier
                     .height(46.dp)
                     .width(180.dp),
@@ -119,7 +117,7 @@ fun AddMoreToCartDialog(
                 colors = ButtonDefaults.buttonColors(BrandYellow)
             ){
                 Text(
-                    text = "Checkout (£${"%.2f".format(totalPrice)})",
+                    text = "Checkout (£${"%.2f".format(grandTotal)})",
                     fontWeight = FontWeight.Bold,
                     fontSize = FontSize.REGULAR,
                     color = TextPrimary
