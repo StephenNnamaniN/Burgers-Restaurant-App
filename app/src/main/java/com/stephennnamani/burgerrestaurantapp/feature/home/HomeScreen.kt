@@ -70,7 +70,7 @@ fun HomeScreen(
     navigateToProfile: () -> Unit,
     navigateToAdminPanel: () -> Unit,
     navigateToDetails: (String) -> Unit,
-    navigateToCart: (Double) -> Unit,
+    navigateToCheckout: (Double) -> Unit,
     navigateToMenu: () -> Unit
 ){
     val navController = rememberNavController()
@@ -243,7 +243,9 @@ fun HomeScreen(
                         }
                         composable<Screens.Cart> {
                             CartScreen(
-                                navigateToCheckout = navigateToCart,
+                                navigateToCheckout = {amount ->
+                                    navigateToCheckout(amount)
+                                },
                                 navigateToMenu = navigateToMenu
                             )
                         }

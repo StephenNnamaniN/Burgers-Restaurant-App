@@ -12,7 +12,7 @@ import com.stephennnamani.burgerrestaurantapp.feature.admin_panel.AdminPanelScre
 import com.stephennnamani.burgerrestaurantapp.feature.admin_panel.manage_product.ManageProductScreen
 import com.stephennnamani.burgerrestaurantapp.feature.auth.AuthScreen
 import com.stephennnamani.burgerrestaurantapp.feature.home.HomeScreen
-import com.stephennnamani.burgerrestaurantapp.feature.home.cart.CartScreen
+import com.stephennnamani.burgerrestaurantapp.feature.payment.CheckoutScreen
 import com.stephennnamani.burgerrestaurantapp.feature.product_details.ProductDetailsScreen
 import com.stephennnamani.burgerrestaurantapp.feature.profile.ProfileScreen
 import com.stephennnamani.burgerrestaurantapp.feature.splash.SplashScreen
@@ -82,7 +82,8 @@ fun BurgerNavGraph(startDestination: Screens = Screens.SplashScreen){
                 navigateToDetails = { productId ->
                     navController.navigate(Screens.DetailsScreen(id = productId))
                 },
-                navigateToCart = {
+                navigateToCheckout = { amount ->
+                    navController.navigate(Screens.Checkout(amount = amount))
                 },
                 navigateToMenu = {}
             )
@@ -126,6 +127,16 @@ fun BurgerNavGraph(startDestination: Screens = Screens.SplashScreen){
                     navController.setHomeTab(HomeTab.Cart)
                     navController.popBackStack()
                 }
+            )
+        }
+
+        composable<Screens.Checkout> { navBackStackEntry ->
+            val checkoutArgs = navBackStackEntry.toRoute<Screens.Checkout>()
+            CheckoutScreen(
+                navigateBack = {
+                    navController.navigateUp()
+                },
+                totalAmount = checkoutArgs.amount
             )
         }
     }

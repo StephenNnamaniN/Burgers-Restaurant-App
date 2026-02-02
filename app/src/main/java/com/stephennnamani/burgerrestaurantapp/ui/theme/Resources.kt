@@ -7,7 +7,10 @@ object Resources {
         val Plus = R.drawable.plus
         val Minus = R.drawable.minus
         val SignIn = R.drawable.log_in
+        val Dropdown = R.drawable.arrow_dropdown
         val SignOut = R.drawable.log_out
+        val MasterCard = R.drawable.master_card
+        val Card = R.drawable.credit_card
         val Unlock = R.drawable.unlock
         val Search = R.drawable.search
         val Person = R.drawable.user
