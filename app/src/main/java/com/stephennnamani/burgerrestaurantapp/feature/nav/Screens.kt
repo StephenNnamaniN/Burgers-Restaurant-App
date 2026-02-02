@@ -55,4 +55,9 @@ sealed class Screens {
     data class Checkout(
         val amount: Double
     ): Screens()
+
+    @Serializable
+    data class ProductCategoryScreen(
+        val category: String
+    ): Screens()
 }

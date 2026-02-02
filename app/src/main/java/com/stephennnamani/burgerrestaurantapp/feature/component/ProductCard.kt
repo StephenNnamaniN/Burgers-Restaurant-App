@@ -7,7 +7,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -35,7 +34,6 @@ import coil3.compose.AsyncImage
 import coil3.compose.LocalPlatformContext
 import coil3.request.ImageRequest
 import coil3.request.crossfade
-import com.stephennnamani.burgerrestaurantapp.core.data.models.Favourite
 import com.stephennnamani.burgerrestaurantapp.core.data.models.Product
 import com.stephennnamani.burgerrestaurantapp.feature.util.Alpha
 import com.stephennnamani.burgerrestaurantapp.ui.theme.BorderIdle
@@ -53,7 +51,7 @@ fun ProductCard(
     modifier: Modifier = Modifier,
     product: Product,
     onClick: (String) -> Unit,
-    showFavouriteIcon: Boolean = false,
+    showFavouriteAction: Boolean = false,
     isFavourite: Boolean = false,
     onToggleFavourite: ((String) -> Unit)? = null
 ){
@@ -148,7 +146,7 @@ fun ProductCard(
                 contentDescription = "Product image",
                 contentScale = ContentScale.Crop
             )
-            if (showFavouriteIcon) {
+            if (showFavouriteAction) {
                 OutlinedIconButton(
                     onClick = {onToggleFavourite?.invoke(product.id)},
                     modifier = Modifier

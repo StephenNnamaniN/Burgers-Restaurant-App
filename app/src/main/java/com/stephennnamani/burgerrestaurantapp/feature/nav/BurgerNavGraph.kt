@@ -12,6 +12,7 @@ import com.stephennnamani.burgerrestaurantapp.feature.admin_panel.AdminPanelScre
 import com.stephennnamani.burgerrestaurantapp.feature.admin_panel.manage_product.ManageProductScreen
 import com.stephennnamani.burgerrestaurantapp.feature.auth.AuthScreen
 import com.stephennnamani.burgerrestaurantapp.feature.home.HomeScreen
+import com.stephennnamani.burgerrestaurantapp.feature.home.categories.CategoryProductScreen
 import com.stephennnamani.burgerrestaurantapp.feature.payment.CheckoutScreen
 import com.stephennnamani.burgerrestaurantapp.feature.product_details.ProductDetailsScreen
 import com.stephennnamani.burgerrestaurantapp.feature.profile.ProfileScreen
@@ -69,7 +70,7 @@ fun BurgerNavGraph(startDestination: Screens = Screens.SplashScreen){
                 startTab = requestStateTab,
 
                 navigateToAuth = {
-                    navController.navigate(Screens.AuthScreen){
+                    navController.navigate(Screens.AuthScreen) {
                         popUpTo<Screens.HomeGraph> { inclusive = true }
                     }
                 },
@@ -85,7 +86,12 @@ fun BurgerNavGraph(startDestination: Screens = Screens.SplashScreen){
                 navigateToCheckout = { amount ->
                     navController.navigate(Screens.Checkout(amount = amount))
                 },
-                navigateToMenu = {}
+                navigateToMenu = {
+                    navController.setHomeTab(HomeTab.Categories)
+                },
+                navigateToProductCategory = { categoryTitle ->
+                    navController.navigate(Screens.ProductCategoryScreen(category = categoryTitle))
+                },
             )
         }
 
@@ -126,6 +132,13 @@ fun BurgerNavGraph(startDestination: Screens = Screens.SplashScreen){
                 navigateToCart = {
                     navController.setHomeTab(HomeTab.Cart)
                     navController.popBackStack()
+                },
+                navigateToCheckout = { amount ->
+                    navController.navigate(Screens.Checkout(amount = amount))
+                },
+                navigateToMenu = {
+                    navController.setHomeTab(HomeTab.Categories)
+                    navController.popBackStack()
                 }
             )
         }
@@ -137,6 +150,21 @@ fun BurgerNavGraph(startDestination: Screens = Screens.SplashScreen){
                     navController.navigateUp()
                 },
                 totalAmount = checkoutArgs.amount
+            )
+        }
+        
+        composable<Screens.ProductCategoryScreen> { entry ->
+            val args = entry.toRoute<Screens.ProductCategoryScreen>()
+            CategoryProductScreen(
+                category = args.category,
+                onNavigateBack = {
+                    navController.setHomeTab(HomeTab.Categories)
+                    navController.popBackStack()
+                },
+                onProductClick = { productId ->
+                    navController.navigate(Screens.DetailsScreen(id = productId))
+
+                }
             )
         }
     }

@@ -1,5 +1,6 @@
 package com.stephennnamani.burgerrestaurantapp.feature.product_details
 
+import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -28,6 +29,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -65,13 +67,32 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun ProductDetailsScreen(
     navigateBack: () -> Unit,
-    navigateToCart: () -> Unit
+    navigateToCart: () -> Unit,
+    navigateToCheckout: (Double) -> Unit,
+    navigateToMenu: () -> Unit
 ){
     val viewModel = koinViewModel<ProductDetailsViewModel>()
     val productState by viewModel.product.collectAsState()
     val quantity by viewModel.quantity.collectAsState()
     val uiState by viewModel.uiState.collectAsState()
 
+    val context = LocalPlatformContext.current
+    LaunchedEffect(uiState.actionMessage) {
+        uiState.actionMessage?.let { msg ->
+            Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        viewModel.events.collect { event ->
+            when (event) {
+                is ProductDetailsEvent.NavigateToCheckout -> event.amount?.let { navigateToCheckout(it) }
+                is ProductDetailsEvent.showMessage ->
+                    Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
+            }
+        }
+
+    }
 
     if (uiState.showSuggestedDialog) {
         AddMoreToCartDialog(
@@ -190,7 +211,7 @@ fun ProductDetailsScreen(
                         text = "Browse for More",
                         icon = painterResource(Resources.Icon.Book),
                         enabled = true,
-                        onClick = {}
+                        onClick = navigateToMenu
                     )
                 }
             }

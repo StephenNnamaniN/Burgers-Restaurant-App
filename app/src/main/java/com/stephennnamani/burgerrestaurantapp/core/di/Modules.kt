@@ -21,6 +21,7 @@ import com.stephennnamani.burgerrestaurantapp.feature.admin_panel.manage_product
 import com.stephennnamani.burgerrestaurantapp.feature.auth.AuthViewModel
 import com.stephennnamani.burgerrestaurantapp.feature.home.HomeViewModel
 import com.stephennnamani.burgerrestaurantapp.feature.home.cart.CartViewModel
+import com.stephennnamani.burgerrestaurantapp.feature.home.categories.FoodMenuViewModel
 import com.stephennnamani.burgerrestaurantapp.feature.home.product_overview.ProductOverviewViewModel
 import com.stephennnamani.burgerrestaurantapp.feature.product_details.ProductDetailsViewModel
 import com.stephennnamani.burgerrestaurantapp.feature.profile.ProfileViewModel
@@ -66,6 +67,7 @@ val appModule = module {
     viewModel { ProductOverviewViewModel(get(), get()) }
     viewModel { ProductDetailsViewModel(get(), get(), get()) }
     viewModel { CartViewModel(get()) }
+    viewModel { FoodMenuViewModel(get(), get(), get()) }
 
     single {
         GoogleUiClient(

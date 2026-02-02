@@ -45,6 +45,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.stephennnamani.burgerrestaurantapp.R
 import com.stephennnamani.burgerrestaurantapp.feature.home.cart.CartScreen
+import com.stephennnamani.burgerrestaurantapp.feature.home.categories.FoodMenuScreen
 import com.stephennnamani.burgerrestaurantapp.feature.home.component.BurgersBottomBar
 import com.stephennnamani.burgerrestaurantapp.feature.home.component.CustomDrawer
 import com.stephennnamani.burgerrestaurantapp.feature.home.domain.BottomBarDestinations
@@ -71,7 +72,8 @@ fun HomeScreen(
     navigateToAdminPanel: () -> Unit,
     navigateToDetails: (String) -> Unit,
     navigateToCheckout: (Double) -> Unit,
-    navigateToMenu: () -> Unit
+    navigateToMenu: () -> Unit,
+    navigateToProductCategory: (String) -> Unit
 ){
     val navController = rememberNavController()
     val currentRoute = navController.currentBackStackEntryAsState()
@@ -246,11 +248,23 @@ fun HomeScreen(
                                 navigateToCheckout = {amount ->
                                     navigateToCheckout(amount)
                                 },
-                                navigateToMenu = navigateToMenu
+                                navigateToMenu = {
+                                    navController.navigate(Screens.Categories){
+                                        launchSingleTop = true
+                                        restoreState = true
+                                        popUpTo<Screens.Cart> { saveState = true }
+                                    }
+                                }
                             )
                         }
                         composable<Screens.Notifications> {}
-                        composable<Screens.Categories> {}
+                        composable<Screens.Categories> {
+                            FoodMenuScreen(
+                                onCategoryClick = { category ->
+                                    navigateToProductCategory(category.title)
+                                }
+                            )
+                        }
                     }
                     Spacer(modifier = Modifier.height(12.dp))
                     Box(

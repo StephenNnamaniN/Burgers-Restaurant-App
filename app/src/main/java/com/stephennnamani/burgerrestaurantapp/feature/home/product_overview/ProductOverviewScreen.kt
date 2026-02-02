@@ -172,7 +172,7 @@ fun ProductOverviewScreen(
                                     ProductCard(
                                         product = product,
                                         onClick = onProductClick,
-                                        showFavouriteIcon = true,
+                                        showFavouriteAction = true,
                                         isFavourite = favouriteIds.contains(product.id),
                                         onToggleFavourite = viewModel::toggleFavourite
                                     )
@@ -209,7 +209,7 @@ fun ProductOverviewScreen(
                                     ProductCard(
                                         product = product,
                                         onClick = onProductClick,
-                                        showFavouriteIcon = true,
+                                        showFavouriteAction = true,
                                         isFavourite = favouriteIds.contains(product.id),
                                         onToggleFavourite = viewModel::toggleFavourite
                                     )
