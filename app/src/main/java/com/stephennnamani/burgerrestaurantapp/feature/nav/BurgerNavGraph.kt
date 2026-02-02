@@ -131,7 +131,7 @@ fun BurgerNavGraph(startDestination: Screens = Screens.SplashScreen){
                 },
                 navigateToCart = {
                     navController.setHomeTab(HomeTab.Cart)
-                    navController.popBackStack()
+                    navController.navigateUp()
                 },
                 navigateToCheckout = { amount ->
                     navController.navigate(Screens.Checkout(amount = amount))

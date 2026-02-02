@@ -15,6 +15,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.stephennnamani.burgerrestaurantapp.ui.theme.BrandYellow
 import com.stephennnamani.burgerrestaurantapp.ui.theme.FontSize
+import com.stephennnamani.burgerrestaurantapp.ui.theme.TextPrimary
 
 @Composable
 fun QuantityStepper(
@@ -32,6 +33,7 @@ fun QuantityStepper(
             text = quantity.toString().padStart(2, '0'),
             fontSize = FontSize.REGULAR,
             fontWeight = FontWeight.Bold,
+            color = TextPrimary,
             modifier = Modifier.padding(horizontal = 12.dp)
 
         )
@@ -56,7 +58,8 @@ private fun StepperButton(
         Text(
             text = text,
             fontSize = FontSize.REGULAR,
-            fontWeight = FontWeight.Bold
+            fontWeight = FontWeight.Bold,
+            color = TextPrimary
         )
     }
 }

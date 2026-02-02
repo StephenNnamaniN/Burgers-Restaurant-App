@@ -13,7 +13,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -121,7 +123,8 @@ fun CheckoutScreen(
             modifier = Modifier
                 .padding(paddingValues)
                 .fillMaxSize()
-                .padding(12.dp),
+                .padding(12.dp)
+                .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             PaymentMethodToggle(
@@ -264,7 +267,10 @@ private fun CardPaymentForm(
                 tint = Color.Unspecified,
                 modifier = Modifier.size(24.dp)
             )
-        }
+        },
+        colors = OutlinedTextFieldDefaults.colors(
+            unfocusedTextColor = TextPrimary
+        )
     )
     Spacer(modifier = Modifier.height(12.dp))
     Text(
@@ -279,6 +285,9 @@ private fun CardPaymentForm(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
         singleLine = true,
+        colors = OutlinedTextFieldDefaults.colors(
+            unfocusedTextColor = TextPrimary
+        )
     )
 
     Spacer(modifier = Modifier.height(12.dp))
@@ -350,7 +359,9 @@ private fun DropdownStub(
             )
         },
         colors = OutlinedTextFieldDefaults.colors(
-            focusedBorderColor = BrandYellow
+            focusedBorderColor = BrandYellow,
+            unfocusedTextColor = TextPrimary
+
         )
     )
 }
@@ -364,7 +375,8 @@ private fun CvvBox(value: String){
         modifier = Modifier.width(54.dp),
         singleLine = true,
         colors = OutlinedTextFieldDefaults.colors(
-            focusedBorderColor = BrandYellow
+            focusedBorderColor = BrandYellow,
+            unfocusedTextColor = TextPrimary
         )
     )
 }
