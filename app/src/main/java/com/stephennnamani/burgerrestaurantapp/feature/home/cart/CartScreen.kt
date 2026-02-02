@@ -30,6 +30,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -153,72 +154,74 @@ private fun CartSummaryCard(
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(SurfaceDark)
     ) {
-        Row(modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
-        ){
-            OutlinedTextField(
-                value = promoCode,
-                onValueChange = onPromoChanged,
-                placeholder = {
-                    Text(
-                        text = "Enter promo code",
-                        fontFamily = sentientVariable(),
-                        fontSize = FontSize.REGULAR
+        Column(modifier = Modifier.padding(12.dp)) {
+            Row(modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ){
+                OutlinedTextField(
+                    value = promoCode,
+                    onValueChange = onPromoChanged,
+                    placeholder = {
+                        Text(
+                            text = "Enter promo code",
+                            fontFamily = sentientVariable(),
+                            fontSize = FontSize.REGULAR
+                        )
+                    },
+                    modifier = Modifier.weight(1f),
+                    singleLine = true,
+                    shape = RoundedCornerShape(50.dp),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        unfocusedBorderColor = BorderIdle,
+                        focusedBorderColor = BrandYellow,
+                        unfocusedContainerColor = Surface
                     )
-                },
-                modifier = Modifier.weight(1f),
-                singleLine = true,
-                shape = RoundedCornerShape(50.dp),
-                colors = OutlinedTextFieldDefaults.colors(
-                    unfocusedBorderColor = BorderIdle,
-                    focusedBorderColor = BrandYellow,
-                    unfocusedContainerColor = Surface
                 )
+                Spacer(modifier = Modifier.width(12.dp))
+                OutlinedButton(
+                    onClick = onApplyPromo,
+                    shape = RoundedCornerShape(50.dp),
+                    border = BorderStroke(1.dp, BrandBrown),
+                    modifier = Modifier.height(42.dp)
+                ) {
+                    Text(
+                        text = "Apply",
+                        fontWeight = FontWeight.Bold,
+                        color = TextPrimary
+                    )
+                }
+            }
+            Spacer(modifier = Modifier.height(12.dp))
+
+            SummaryRow(label = "Subtotal", value = "£${"%.2f".format(subTotal)}")
+            SummaryRow(label = "Delivery fee", value = "£${"%.2f".format(deliveryFee)}")
+            SummaryRow(label = "Vat %", value = "${(vatPercent * 100).toInt()}%")
+
+            HorizontalDivider(
+                modifier = Modifier.padding(vertical = 10.dp),
+                color = Color.Black.copy(0.8f)
             )
-            Spacer(modifier = Modifier.width(12.dp))
-            OutlinedButton(
-                onClick = onApplyPromo,
-                shape = RoundedCornerShape(50.dp),
-                border = BorderStroke(1.dp, BrandBrown),
-                modifier = Modifier.height(42.dp)
+
+            SummaryRow(label = "Total Amount", value = "£${"%.2f".format(totalAmount)}", bold = true)
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            Button(
+                onClick = onCheckout,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(52.dp),
+                shape = RoundedCornerShape(12.dp),
+                colors = ButtonDefaults.buttonColors(BrandBrown)
             ) {
                 Text(
-                    text = "Apply",
+                    text = "Checkout",
                     fontWeight = FontWeight.Bold,
-                    color = TextPrimary
+                    fontSize = FontSize.REGULAR,
+                    color = TextWhite
                 )
             }
         }
-        Spacer(modifier = Modifier.width(12.dp))
-        SummaryRow(label = "Subtotal", value = "£${"%.2f".format(subTotal)}")
-        SummaryRow(label = "Delivery fee", value = "£${"%.2f".format(deliveryFee)}")
-        SummaryRow(label = "Vat %", value = "£${"%.2f".format(vatPercent * 100).toInt()}%")
-
-        HorizontalDivider(
-            modifier = Modifier.padding(vertical = 10.dp),
-            color = BorderIdle
-        )
-
-        SummaryRow(label = "Total Amount", value = "£${"%.2f".format(totalAmount)}", bold = true)
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        Button(
-            onClick = onCheckout,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(52.dp),
-            shape = RoundedCornerShape(12.dp),
-            colors = ButtonDefaults.buttonColors(BrandBrown)
-        ) {
-            Text(
-                text = "Checkout",
-                fontWeight = FontWeight.Bold,
-                fontSize = FontSize.REGULAR,
-                color = TextWhite
-            )
-        }
-
     }
 }
 

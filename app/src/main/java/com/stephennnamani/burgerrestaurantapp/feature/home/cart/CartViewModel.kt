@@ -23,6 +23,14 @@ class CartViewModel(
     private val _uiState = MutableStateFlow(CartUiState())
     val uiState: StateFlow<CartUiState> = _uiState
 
+    init {
+        viewModelScope.launch {
+            cartRepository.observerCartItems().collect { start ->
+                _uiState.update { it.copy(cartItems = start) }
+            }
+        }
+    }
+
     fun onPromoCodeChanged(value: String) {
         _uiState.update { it.copy(promoCode = value) }
     }
