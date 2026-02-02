@@ -1,6 +1,9 @@
 package com.stephennnamani.burgerrestaurantapp.feature.nav
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -9,10 +12,18 @@ import com.stephennnamani.burgerrestaurantapp.feature.admin_panel.AdminPanelScre
 import com.stephennnamani.burgerrestaurantapp.feature.admin_panel.manage_product.ManageProductScreen
 import com.stephennnamani.burgerrestaurantapp.feature.auth.AuthScreen
 import com.stephennnamani.burgerrestaurantapp.feature.home.HomeScreen
+import com.stephennnamani.burgerrestaurantapp.feature.home.cart.CartScreen
 import com.stephennnamani.burgerrestaurantapp.feature.product_details.ProductDetailsScreen
 import com.stephennnamani.burgerrestaurantapp.feature.profile.ProfileScreen
 import com.stephennnamani.burgerrestaurantapp.feature.splash.SplashScreen
 
+const val HOME_TAB_KEY = "HOME_TAB_KEY"
+private fun NavController.setHomeTab(tab: HomeTab){
+    try {
+        val homeEntry = getBackStackEntry<Screens.HomeGraph>()
+        homeEntry.savedStateHandle[HOME_TAB_KEY] = tab
+    }catch (e: IllegalArgumentException){}
+}
 @Composable
 fun BurgerNavGraph(startDestination: Screens = Screens.SplashScreen){
     val navController = rememberNavController()
@@ -29,7 +40,7 @@ fun BurgerNavGraph(startDestination: Screens = Screens.SplashScreen){
                     }
                 },
                 navigateToHome = {
-                    navController.navigate(Screens.HomeGraph){
+                    navController.navigate(Screens.HomeGraph()){
                         popUpTo<Screens.AuthScreen> { inclusive = true }
                     }
 
@@ -40,15 +51,23 @@ fun BurgerNavGraph(startDestination: Screens = Screens.SplashScreen){
         composable<Screens.AuthScreen> {
             AuthScreen(
                 navigateToHome = {
-                    navController.navigate(Screens.HomeGraph){
+                    navController.navigate(Screens.HomeGraph()){
                         popUpTo<Screens.AuthScreen> { inclusive = true }
                     }
                 }
             )
         }
 
-        composable<Screens.HomeGraph> {
+        composable<Screens.HomeGraph> { entry ->
+            val args = entry.toRoute<Screens.HomeGraph>()
+
+            // Listen for incoming tab switch requests
+            val requestedTabFlow = entry.savedStateHandle.getStateFlow(HOME_TAB_KEY, args.start)
+            val requestStateTab by requestedTabFlow.collectAsState()
+
             HomeScreen(
+                startTab = requestStateTab,
+
                 navigateToAuth = {
                     navController.navigate(Screens.AuthScreen){
                         popUpTo<Screens.HomeGraph> { inclusive = true }
@@ -62,7 +81,10 @@ fun BurgerNavGraph(startDestination: Screens = Screens.SplashScreen){
                 },
                 navigateToDetails = { productId ->
                     navController.navigate(Screens.DetailsScreen(id = productId))
-                }
+                },
+                navigateToCart = {
+                },
+                navigateToMenu = {}
             )
         }
 
@@ -99,6 +121,10 @@ fun BurgerNavGraph(startDestination: Screens = Screens.SplashScreen){
             ProductDetailsScreen(
                 navigateBack = {
                     navController.navigateUp()
+                },
+                navigateToCart = {
+                    navController.setHomeTab(HomeTab.Cart)
+                    navController.popBackStack()
                 }
             )
         }

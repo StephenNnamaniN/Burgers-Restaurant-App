@@ -24,6 +24,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -43,6 +44,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.stephennnamani.burgerrestaurantapp.R
+import com.stephennnamani.burgerrestaurantapp.feature.home.cart.CartScreen
 import com.stephennnamani.burgerrestaurantapp.feature.home.component.BurgersBottomBar
 import com.stephennnamani.burgerrestaurantapp.feature.home.component.CustomDrawer
 import com.stephennnamani.burgerrestaurantapp.feature.home.domain.BottomBarDestinations
@@ -50,6 +52,7 @@ import com.stephennnamani.burgerrestaurantapp.feature.home.domain.CustomDrawerSt
 import com.stephennnamani.burgerrestaurantapp.feature.home.domain.isOpened
 import com.stephennnamani.burgerrestaurantapp.feature.home.domain.reverse
 import com.stephennnamani.burgerrestaurantapp.feature.home.product_overview.ProductOverviewScreen
+import com.stephennnamani.burgerrestaurantapp.feature.nav.HomeTab
 import com.stephennnamani.burgerrestaurantapp.feature.nav.Screens
 import com.stephennnamani.burgerrestaurantapp.ui.theme.BrandBrown
 import com.stephennnamani.burgerrestaurantapp.ui.theme.FontSize
@@ -62,10 +65,13 @@ import org.koin.androidx.compose.koinViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
+    startTab: HomeTab = HomeTab.Products,
     navigateToAuth: () -> Unit,
     navigateToProfile: () -> Unit,
     navigateToAdminPanel: () -> Unit,
-    navigateToDetails: (String) -> Unit
+    navigateToDetails: (String) -> Unit,
+    navigateToCart: (Double) -> Unit,
+    navigateToMenu: () -> Unit
 ){
     val navController = rememberNavController()
     val currentRoute = navController.currentBackStackEntryAsState()
@@ -87,6 +93,30 @@ fun HomeScreen(
                 route.contains(BottomBarDestinations.CategoriesScreen.screen.toString()) -> BottomBarDestinations.CategoriesScreen
                 else -> BottomBarDestinations.ProductOverviewScreen
             }
+        }
+    }
+
+    val startDestination = remember(startTab) {
+        when(startTab) {
+            HomeTab.Products -> Screens.ProductOverviewScreen
+            HomeTab.Cart -> Screens.Cart
+            HomeTab.Notifications -> Screens.Notifications
+            HomeTab.Categories -> Screens.Categories
+        }
+    }
+
+    LaunchedEffect(startTab) {
+        val destinations = when(startTab){
+            HomeTab.Products -> Screens.ProductOverviewScreen
+            HomeTab.Cart -> Screens.Cart
+            HomeTab.Notifications -> Screens.Notifications
+            HomeTab.Categories -> Screens.Categories
+        }
+
+        navController.navigate(destinations){
+            launchSingleTop = true
+            restoreState = true
+            popUpTo<Screens.ProductOverviewScreen> { saveState = true }
         }
     }
 
@@ -204,14 +234,19 @@ fun HomeScreen(
                     NavHost(
                         modifier = Modifier.weight(1f),
                         navController = navController,
-                        startDestination = Screens.ProductOverviewScreen
+                        startDestination = startDestination
                     ){
                         composable<Screens.ProductOverviewScreen> {
                             ProductOverviewScreen (
                                 onProductClick = navigateToDetails
                             )
                         }
-                        composable<Screens.Cart> {}
+                        composable<Screens.Cart> {
+                            CartScreen(
+                                navigateToCheckout = navigateToCart,
+                                navigateToMenu = navigateToMenu
+                            )
+                        }
                         composable<Screens.Notifications> {}
                         composable<Screens.Categories> {}
                     }

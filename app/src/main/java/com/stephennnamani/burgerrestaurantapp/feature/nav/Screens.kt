@@ -1,6 +1,13 @@
 package com.stephennnamani.burgerrestaurantapp.feature.nav
 
 import kotlinx.serialization.Serializable
+@Serializable
+enum class HomeTab{
+    Products,
+    Cart,
+    Notifications,
+    Categories
+}
 
 
 @Serializable
@@ -12,7 +19,9 @@ sealed class Screens {
     data object AuthScreen: Screens()
 
     @Serializable
-    data object HomeGraph: Screens()
+    data class HomeGraph(
+        val start: HomeTab = HomeTab.Products
+    ): Screens()
 
     @Serializable
     data object ProductOverviewScreen: Screens()
@@ -40,5 +49,10 @@ sealed class Screens {
     @Serializable
     data class DetailsScreen(
         val id: String
+    ): Screens()
+
+    @Serializable
+    data class CartScreen(
+        val amount: Double
     ): Screens()
 }
