@@ -22,6 +22,14 @@
           }
         },
         {
+          "client_id": "155467344487-vkoqk4d77sod098qd1r3m08takdbltl6.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.stephennnamani.burgerrestaurantapp",
+            "certificate_hash": "c42aea6627fbb2febb0be211ac3c9a45030c1b04"
+          }
+        },
+        {
           "client_id": "155467344487-a8u99jb9nu8rucpcqh7sobkika7j4tda.apps.googleusercontent.com",
           "client_type": 3
         }

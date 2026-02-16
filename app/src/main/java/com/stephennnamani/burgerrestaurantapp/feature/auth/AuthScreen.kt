@@ -11,6 +11,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -22,6 +24,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -31,8 +34,11 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.stephennnamani.burgerrestaurantapp.R
 import com.stephennnamani.burgerrestaurantapp.core.data.auth.GoogleUiClient
 import com.stephennnamani.burgerrestaurantapp.feature.component.GoogleButton
+import com.stephennnamani.burgerrestaurantapp.feature.component.LoadingCard
 import com.stephennnamani.burgerrestaurantapp.feature.component.PrimaryButton
 import com.stephennnamani.burgerrestaurantapp.feature.util.RequestState
+import com.stephennnamani.burgerrestaurantapp.ui.theme.BrandBrown
+import com.stephennnamani.burgerrestaurantapp.ui.theme.BrandYellow
 import com.stephennnamani.burgerrestaurantapp.ui.theme.FontSize
 import com.stephennnamani.burgerrestaurantapp.ui.theme.Resources
 import com.stephennnamani.burgerrestaurantapp.ui.theme.oswaldVariableFont

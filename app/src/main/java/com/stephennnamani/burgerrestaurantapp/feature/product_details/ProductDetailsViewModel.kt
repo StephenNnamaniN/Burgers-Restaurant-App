@@ -182,12 +182,10 @@ class ProductDetailsViewModel(
         }
     }
 
-    fun confirmSuggestedSelectionToCart(
-        onDone: () -> Unit
-    ){
+    fun confirmSuggestedSelectionToCart(onDone: () -> Unit) {
         val state = _baseUiState.value
         val selected = state.suggestedQuantities.filterValues { it > 0 }
-        if(selected.isEmpty()) {
+        if (selected.isEmpty()) {
             _baseUiState.update {
                 it.copy(
                     suggestedQuantities = emptyMap(),
@@ -205,7 +203,7 @@ class ProductDetailsViewModel(
             _baseUiState.update { it.copy(actionMessage = null) }
             val errors = mutableListOf<String>()
 
-            selected.forEach { (productId, qty)  ->
+            selected.forEach { (productId, qty) ->
                 val product = productById[productId]
 
                 if (product == null) {
@@ -221,15 +219,16 @@ class ProductDetailsViewModel(
                 if (result is RequestState.Error) {
                     errors.add("Failed to add ${product.title}: ${result.message}")
                 }
-                if (errors.isNotEmpty()){
-                    _baseUiState.update {
-                        it.copy(
-                            actionMessage = errors.joinToString { "\n" },
-                            showSuggestedDialog = true
-                        )
-                    }
-                    return@launch
+            }
+
+            if (errors.isNotEmpty()) {
+                _baseUiState.update {
+                    it.copy(
+                        actionMessage = errors.joinToString(" "),
+                        showSuggestedDialog = true
+                    )
                 }
+            } else {
                 _baseUiState.update {
                     it.copy(
                         suggestedQuantities = emptyMap(),
@@ -256,16 +255,15 @@ class ProductDetailsViewModel(
         val product = product.value.getSuccessDataOrNull()
         if (product == null){
             _events.tryEmit(ProductDetailsEvent.showMessage("Product not available yet."))
+            return
         }
 
         val qty = quantity.value.coerceAtLeast(1)
-        val total = (product?.price?.times(qty))
+        val total = (product.price * qty)
 
-        if (total != null){
-            if (total <= 0.0) {
-                _events.tryEmit(ProductDetailsEvent.showMessage("Invalid total amount."))
-                return
-            }
+        if (total <= 0.0) {
+            _events.tryEmit(ProductDetailsEvent.showMessage("Invalid total amount."))
+            return
         }
         _events.tryEmit(ProductDetailsEvent.NavigateToCheckout(amount = total))
     }

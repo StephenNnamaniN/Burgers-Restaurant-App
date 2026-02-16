@@ -147,7 +147,8 @@ fun BurgerNavGraph(startDestination: Screens = Screens.SplashScreen){
             val checkoutArgs = navBackStackEntry.toRoute<Screens.Checkout>()
             CheckoutScreen(
                 navigateBack = {
-                    navController.navigateUp()
+                    navController.setHomeTab(HomeTab.Cart)
+                    navController.popBackStack()
                 },
                 totalAmount = checkoutArgs.amount
             )

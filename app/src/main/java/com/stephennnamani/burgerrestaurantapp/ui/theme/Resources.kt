@@ -8,6 +8,7 @@ object Resources {
         val Minus = R.drawable.minus
         val SignIn = R.drawable.log_in
         val Dropdown = R.drawable.arrow_dropdown
+        val MoreHorizontal = R.drawable.outline_more_horiz_24
         val SignOut = R.drawable.log_out
         val MasterCard = R.drawable.master_card
         val Card = R.drawable.credit_card
