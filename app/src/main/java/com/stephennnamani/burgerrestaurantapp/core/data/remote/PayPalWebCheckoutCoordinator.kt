@@ -1,11 +1,10 @@
 package com.stephennnamani.burgerrestaurantapp.core.data.remote
 
 
+import android.content.Context
 import android.content.Intent
 import android.util.Log
 import androidx.activity.ComponentActivity
-import com.google.api.Context
-import com.paypal.android.corepayments.BuildConfig
 import com.paypal.android.corepayments.CoreConfig
 import com.paypal.android.corepayments.Environment
 import com.paypal.android.paypalwebpayments.PayPalPresentAuthChallengeResult
@@ -13,6 +12,7 @@ import com.paypal.android.paypalwebpayments.PayPalWebCheckoutClient
 import com.paypal.android.paypalwebpayments.PayPalWebCheckoutFinishStartResult
 import com.paypal.android.paypalwebpayments.PayPalWebCheckoutFundingSource
 import com.paypal.android.paypalwebpayments.PayPalWebCheckoutRequest
+import com.stephennnamani.burgerrestaurantapp.BuildConfig
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
