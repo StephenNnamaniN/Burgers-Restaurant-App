@@ -17,7 +17,7 @@ data class CapturePayPalOrderRequest(
     val orderId: String
 )
 
-data class CaptureOrderResponse(
+data class CapturePayPalOrderResponse(
     val status: String,
     val captureId: String? = null
 )
@@ -32,5 +32,5 @@ interface PaymentApi {
     @POST("paypal/capture-order")
     suspend fun capturePayPalOrder(
         @Body requestBody: CapturePayPalOrderRequest
-    ): CaptureOrderResponse
+    ): CapturePayPalOrderResponse
 }
