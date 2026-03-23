@@ -104,4 +104,10 @@ dependencies {
     implementation("com.squareup.okhttp3:okhttp:5.2.0")
     implementation("com.squareup.retrofit2:converter-gson:3.0.0")
     implementation("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:1.0.0")
+
+    //Paypal
+    implementation(libs.paypal.web.payments)
+    implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
+    implementation(libs.paypal.core.payments)
+    implementation("com.google.android.gms:play-services-tasks:18.2.0")
 }

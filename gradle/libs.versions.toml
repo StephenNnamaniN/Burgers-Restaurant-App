@@ -27,7 +27,7 @@ googleid = "1.1.1"
 firebaseFirestore = "26.0.1"
 firebaseDatabase = "22.0.1"
 firebaseStorage = "22.0.1"
-
+paypal = "2.3.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -71,6 +71,10 @@ googleid = { group = "com.google.android.libraries.identity.googleid", name = "g
 firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore", version.ref = "firebaseFirestore" }
 firebase-database = { group = "com.google.firebase", name = "firebase-database", version.ref = "firebaseDatabase" }
 firebase-storage = { group = "com.google.firebase", name = "firebase-storage", version.ref = "firebaseStorage" }
+
+# Paypal
+paypal-web-payments = { group = "com.paypal.android", name = "paypal-web-payments", version.ref = "paypal" }
+paypal-core-payments = { group = "com.paypal.android", name = "core-payments", version.ref = "paypal" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
