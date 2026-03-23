@@ -87,7 +87,7 @@ fun ProductDetailsScreen(
         viewModel.events.collect { event ->
             when (event) {
                 is ProductDetailsEvent.NavigateToCheckout -> event.amount?.let { navigateToCheckout(it) }
-                is ProductDetailsEvent.showMessage ->
+                is ProductDetailsEvent.ShowMessage ->
                     Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
             }
         }

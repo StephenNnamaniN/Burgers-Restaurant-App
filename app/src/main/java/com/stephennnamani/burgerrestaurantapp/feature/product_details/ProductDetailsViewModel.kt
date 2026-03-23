@@ -21,7 +21,6 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.selects.select
 
 data class ProductDetailsUiState(
     val showSuggestedDialog: Boolean = false,
@@ -36,7 +35,7 @@ data class ProductDetailsUiState(
 
 sealed interface ProductDetailsEvent {
     data class NavigateToCheckout(val amount: Double?): ProductDetailsEvent
-    data class showMessage(val message: String): ProductDetailsEvent
+    data class ShowMessage(val message: String): ProductDetailsEvent
 }
 class ProductDetailsViewModel(
     private val productRepository: ProductRepository,
@@ -254,7 +253,7 @@ class ProductDetailsViewModel(
     fun buyNow(){
         val product = product.value.getSuccessDataOrNull()
         if (product == null){
-            _events.tryEmit(ProductDetailsEvent.showMessage("Product not available yet."))
+            _events.tryEmit(ProductDetailsEvent.ShowMessage("Product not available yet."))
             return
         }
 
@@ -262,7 +261,7 @@ class ProductDetailsViewModel(
         val total = (product.price * qty)
 
         if (total <= 0.0) {
-            _events.tryEmit(ProductDetailsEvent.showMessage("Invalid total amount."))
+            _events.tryEmit(ProductDetailsEvent.ShowMessage("Invalid total amount."))
             return
         }
         _events.tryEmit(ProductDetailsEvent.NavigateToCheckout(amount = total))

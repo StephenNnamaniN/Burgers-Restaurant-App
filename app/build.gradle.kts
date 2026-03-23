@@ -20,6 +20,9 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        buildConfigField("String", "PAYPAL_CLIENT_ID", "\"AXJfaZVxftW7n91sCNIBBXE_BuM_7CLYE3awQeNuHbgOZ01s7e5KFMGqNhJhv4-qSqsaMsjfF59ozwKo\"")
+        buildConfigField("String", "PAYPAL_RETURN_URL", "\"com.stephennnamani.burgerrestaurantapp\"")
+        buildConfigField("String", "PAYMENTS_BASE_URL", "\"https://us-central1-burger-restaurant-app.cloudfunctions.net/api/\"")
     }
 
     buildTypes {
