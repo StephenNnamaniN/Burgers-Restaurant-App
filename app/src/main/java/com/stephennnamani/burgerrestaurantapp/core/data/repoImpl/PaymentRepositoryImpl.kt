@@ -28,7 +28,7 @@ class PaymentRepositoryImpl(
     }
 
     override suspend fun capturePayPalOrder(orderId: String): Result<CapturePayPalOrderResponse> = runCatching {
-        Log.d("BurgerPayments", "createPayPalOrder -> $orderId")
+        Log.d("BurgerPayments", "capturePayPalOrder -> $orderId")
         paymentApi.capturePayPalOrder(CapturePayPalOrderRequest(orderId))
     }.onFailure {
         Log.e("BurgerPayments", "capturePayPalOrder failed-> ${it.message}", it)

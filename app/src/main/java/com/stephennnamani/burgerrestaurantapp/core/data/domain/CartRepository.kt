@@ -10,4 +10,6 @@ interface CartRepository {
     suspend fun decrement(productId: String): RequestState<Unit>
     suspend fun delete(productId: String): RequestState<Unit>
     suspend fun setQuantity(productId: String, quantity: Int): RequestState<Unit>
+
+    suspend fun clearCart(): RequestState<Unit>
 }

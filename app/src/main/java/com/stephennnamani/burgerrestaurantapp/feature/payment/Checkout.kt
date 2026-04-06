@@ -1,5 +1,6 @@
 package com.stephennnamani.burgerrestaurantapp.feature.payment
 
+import androidx.activity.ComponentActivity
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -33,6 +34,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -44,12 +46,20 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.dropShadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.shadow.Shadow
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.stephennnamani.burgerrestaurantapp.feature.component.InfoCard
+import com.stephennnamani.burgerrestaurantapp.feature.payment.paypal.CheckoutViewModel
+import com.stephennnamani.burgerrestaurantapp.feature.payment.paypal.PayPalCheckoutViewModel
+import com.stephennnamani.burgerrestaurantapp.feature.payment.paypal.PayPalPaymentResult
 import com.stephennnamani.burgerrestaurantapp.feature.util.Alpha
+import com.stephennnamani.burgerrestaurantapp.feature.util.DisplayResult
+import com.stephennnamani.burgerrestaurantapp.feature.util.MessageUtils
+import com.stephennnamani.burgerrestaurantapp.feature.util.RequestState
 import com.stephennnamani.burgerrestaurantapp.ui.theme.BorderIdle
 import com.stephennnamani.burgerrestaurantapp.ui.theme.BrandBrown
 import com.stephennnamani.burgerrestaurantapp.ui.theme.BrandYellow
@@ -63,6 +73,7 @@ import com.stephennnamani.burgerrestaurantapp.ui.theme.SurfaceLight
 import com.stephennnamani.burgerrestaurantapp.ui.theme.TextPrimary
 import com.stephennnamani.burgerrestaurantapp.ui.theme.TextWhite
 import com.stephennnamani.burgerrestaurantapp.ui.theme.oswaldVariableFont
+import org.koin.androidx.compose.koinViewModel
 
 enum class PaymentMethod{
     Card,
@@ -73,10 +84,34 @@ enum class PaymentMethod{
 @Composable
 fun CheckoutScreen(
     navigateBack: () -> Unit,
+    navigateCart: () -> Unit,
     totalAmount: Double
 ){
+    val checkoutVm = koinViewModel<CheckoutViewModel>()
+    val payPalVm = koinViewModel<PayPalCheckoutViewModel>()
+
+    val checkoutUiState by checkoutVm.uiState.collectAsStateWithLifecycle()
+    val payPalUiState by payPalVm.payPalUiState.collectAsStateWithLifecycle()
+
     var method by remember { mutableStateOf(PaymentMethod.Card) }
     var savedCard by remember { mutableStateOf(true) }
+
+    val activity = LocalContext.current
+
+    MessageUtils.ShowToast(message = payPalUiState.toast)
+
+    LaunchedEffect(payPalUiState.toast) {
+        if (payPalUiState.toast.isNotBlank()) payPalVm.consumeToast()
+    }
+
+    LaunchedEffect(payPalUiState.navigateToCart) {
+        if (payPalUiState.navigateToCart){
+            payPalVm.consumeNavigateToCart()
+            navigateCart()
+        }
+    }
+
+
     Scaffold(
         containerColor = Surface,
         topBar = {
@@ -153,20 +188,49 @@ fun CheckoutScreen(
                             onToggleSave = { savedCard = it }
                         )
                     } else {
-                        PayPalPlaceHolder()
+                        PayPalSection(payPalUiState.state)
                     }
                 }
             }
 
-            DeliveryDetailsCard(
-                address = "3 Home Boulevard, Kingston",
-                postCode = "NE52 6NT",
-                onEditAddress = {},
-                onEditPostcode = {}
+            checkoutUiState.delivery.DisplayResult(
+                onLoading = {
+                    DeliveryDetailsCard(
+                        address = "Loading...",
+                        postCode = "Loading...",
+                        onEditAddress = {},
+                        onEditPostcode = {}
+                    )
+                },
+                onError = {
+                    DeliveryDetailsCard(
+                        address = "Unknown",
+                        postCode = "Unknown",
+                        onEditAddress = {},
+                        onEditPostcode = {}
+                    )
+                },
+                onSuccess = { delivery ->
+                    DeliveryDetailsCard(
+                        address = delivery.addressLine,
+                        postCode = delivery.postcode,
+                        onEditAddress = {},
+                        onEditPostcode = {}
+                    )
+                }
             )
 
             Button(
-                onClick = {},
+                onClick = {
+                    if (method == PaymentMethod.Card){
+                        //Stub
+                        return@Button
+                    }
+                    payPalVm.startPayPalCheckout(
+                        activity as ComponentActivity,
+                        totalAmount
+                    )
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(54.dp),
@@ -184,6 +248,41 @@ fun CheckoutScreen(
         }
     }
 }
+
+@Composable
+private fun PayPalSection(state: RequestState<PayPalPaymentResult>){
+    state.DisplayResult(
+        onIdle = {
+            InfoCard(
+                image = Resources.Image.PaypalLogo,
+                title = "PayPal ready",
+                subtitle = "Tap CONFIRM & PAY to continue."
+            )
+        },
+        onLoading = {
+            InfoCard(
+                image = Resources.Image.PaypalLogo,
+                title = "Processing...",
+                subtitle = "Hang tight - we're talking to PayPal securely."
+            )
+        },
+        onError = { msg ->
+            InfoCard(
+                image = Resources.Icon.Dog,
+                title = "Oops!",
+                subtitle = msg
+            )
+        },
+        onSuccess = { result ->
+            InfoCard(
+                image = Resources.Image.PaypalLogo,
+                title = "Payment ${result.status}",
+                subtitle = "Capture: ${result.captureId ?: "-"}"
+            )
+        }
+    )
+}
+
 
 @Composable
 private fun PaymentMethodToggle(
@@ -384,7 +483,7 @@ private fun CvvBox(value: String){
 @Composable
 private fun DeliveryDetailsCard(
     address: String,
-    postCode: String,
+    postCode: String?,
     onEditAddress: () -> Unit,
     onEditPostcode: () -> Unit
 ){
@@ -412,7 +511,7 @@ private fun DeliveryDetailsCard(
             Spacer(modifier = Modifier.height(8.dp))
             DeliveryRow(value = address, onEdit = onEditAddress)
             Spacer(modifier = Modifier.height(8.dp))
-            DeliveryRow(value = postCode, onEdit = onEditPostcode)
+            DeliveryRow(value = postCode ?: "Unknown", onEdit = onEditPostcode)
         }
     }
 }
@@ -453,13 +552,13 @@ private fun DeliveryRow(
     }
 }
 
-@Composable
-private fun PayPalPlaceHolder(){
-    Column(modifier = Modifier.height(300.dp)) {
-        InfoCard(
-            image = Resources.Icon.Dog,
-            title = "Oops!",
-            subtitle = "Paypal checkout coming next."
-        )
-    }
-}
+//@Composable
+//private fun PayPalPlaceHolder(){
+//    Column(modifier = Modifier.height(300.dp)) {
+//        InfoCard(
+//            image = Resources.Icon.Dog,
+//            title = "Oops!",
+//            subtitle = "Paypal checkout coming next."
+//        )
+//    }
+//}

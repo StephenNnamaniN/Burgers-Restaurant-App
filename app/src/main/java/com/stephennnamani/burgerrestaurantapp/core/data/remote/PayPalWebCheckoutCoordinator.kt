@@ -70,7 +70,7 @@ class PayPalWebCheckoutCoordinator(
         when (val result = client.start(activity = activity, request)){
             is PayPalPresentAuthChallengeResult.Success -> {
                 Log.d(tag, "startCheckout() -> Launched browser for orderId=$orderId")
-                emit(Event.Approved(orderId))
+//                emit(Event.Approved(orderId))
             }
             is PayPalPresentAuthChallengeResult.Failure -> {
                 val msg = result.error.errorDescription
@@ -84,10 +84,11 @@ class PayPalWebCheckoutCoordinator(
     fun handleReturnIntent(intent: Intent?) {
         if (intent == null) return
 
+        Log.d(tag, "handleReturnIntent: data=${intent.data}")
         when (val result = client.finishStart(intent)) {
             is PayPalWebCheckoutFinishStartResult.Success -> {
                 val orderId = lastOrderId ?: "Unknown"
-                Log.d(tag, "finishStart() -> orderId=$orderId")
+                Log.d(tag, "finishStart() -> Success, orderId=$orderId")
                 emit(Event.Approved(orderId))
                 lastOrderId = null
             }
