@@ -41,6 +41,12 @@ A modern, production-ready courier and food delivery mobile application built wi
 - Unidirectional data flow
 - Modular composables for UI reuse
 
+| Splash Screen | Search Filter | Country Details |
+| :---: | :---: | :---: |
+<img width="1224" height="2570" alt="Stephen Nnamani Splash" src="https://github.com/user-attachments/assets/cad66f0a-6ba4-45a2-818d-3b50abaa4272" />
+
+
+
 ## 🎬 YouTube Series
 This project is documented in a multi-episode series teaching:
 - Advanced Jetpack Compose
