@@ -43,7 +43,7 @@ A modern, production-ready courier and food delivery mobile application built wi
 
 | Splash Screen | Search Filter | Country Details |
 | :---: | :---: | :---: |
-<img width="1224" height="2570" alt="Stephen Nnamani Splash" src="https://github.com/user-attachments/assets/cad66f0a-6ba4-45a2-818d-3b50abaa4272" />
+<img width="200" height="300" alt="Stephen Nnamani Splash" src="https://github.com/user-attachments/assets/cad66f0a-6ba4-45a2-818d-3b50abaa4272" />
 
 
 
