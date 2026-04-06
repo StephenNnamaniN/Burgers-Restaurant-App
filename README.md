@@ -1,6 +1,6 @@
 # Courier & Food Delivery App (Android – Kotlin, Jetpack Compose, Firebase)
 
-A modern, production-ready courier and food delivery mobile application built with Kotlin and Jetpack Compose. This app supports multi-role flows (Customer, Supplier, Driver), real-time tracking, product management, and full Firebase integration.
+**Burgers Restaurant App** is a modern, production-ready courier and food delivery mobile application built with Kotlin and Jetpack Compose. This app supports multi-role flows (Customer, Supplier, Driver), real-time tracking, product management, and full Firebase integration.
 
 ## 🚀 Tech Stack
 - **Kotlin**
