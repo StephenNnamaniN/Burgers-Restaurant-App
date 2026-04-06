@@ -41,9 +41,16 @@ A modern, production-ready courier and food delivery mobile application built wi
 - Unidirectional data flow
 - Modular composables for UI reuse
 
-| Splash Screen | Search Filter | Country Details |
+| Splash Screen | Login | Drawer | Product Overview | Details Screen | Product Categories | Suggested Products | Cart | Paypal Checkout |
 | :---: | :---: | :---: |
-<img width="200" alt="Stephen Nnamani Splash" src="https://github.com/user-attachments/assets/cad66f0a-6ba4-45a2-818d-3b50abaa4272" />
+| <img width="200" alt="Stephen Nnamani Splash" src="https://github.com/user-attachments/assets/cad66f0a-6ba4-45a2-818d-3b50abaa4272" /> | <img width="200" alt="Stephen Nnamani Login" src="https://github.com/user-attachments/assets/3e77924c-1d43-4db0-8e44-36646c85faac" /> | <img width="200" alt="Stephen Nnamani Drawer" src="https://github.com/user-attachments/assets/22469332-fe63-454b-9577-7bd88e9fa124" /> | <img width="200" alt="Stephen Nnamani Product Overview" src="https://github.com/user-attachments/assets/21134d03-e32a-4dac-b5af-7e460f21ac65" /> | <img width="200" alt="Stephen Nnamani Details Screen" src="https://github.com/user-attachments/assets/b00d21af-123a-4bc5-bd61-979afc61b066" /> | <img width="200" alt="Stephen Nnamani Product Categories" src="https://github.com/user-attachments/assets/29a4d05f-e68a-404e-84e3-af45d1b53a35" /> | <img width="200" alt="Stephen Nnamani Suggested Products" src="https://github.com/user-attachments/assets/c28e5918-e1ab-4ab9-b22c-0c7c74c5a749" /> | <img width="200" alt="Stephen Nnamani Cart" src="https://github.com/user-attachments/assets/2369fa1e-0ef6-47dd-b373-786bacc19b69" /> | <img width="200" alt="Stephen Nnamani PayPal Checkout" src="https://github.com/user-attachments/assets/cd2a01ed-8b9a-42c8-9813-d50efa571926" />
+ 
+
+
+
+
+
+
 
 
 
